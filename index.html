@@ -27,6 +27,8 @@
 <section class="hero" id="top">
   <div class="wrap">
     <div class="topbar"><p class="eyebrow label-mono">Lahore, Pakistan (UTC+5) · Open to remote</p><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch light or dark theme">Light mode</button></div>
+    <div class="hero-grid">
+    <div class="hero-copy">
     <h1>Tayyab Bilal</h1>
     <p class="role">Senior AI Engineer. I build agents that act on real systems, safely.</p>
     <p class="sub">5 years in ML and AI, about 4 of them building agents: Rasa state machines first, then hand-written ReAct loops, now LangGraph. My focus is the part around the model: permissions, approvals, budgets, retries and evaluation.</p>
@@ -41,6 +43,21 @@
       <a class="btn" href="https://github.com/Tayyab-Bilal">GitHub</a>
       <a class="btn" href="https://www.linkedin.com/in/tayyab-bilal-79b509187/">LinkedIn</a>
       <a class="btn" href="cv.pdf" download="Tayyab-Bilal-CV.pdf">Download CV</a>
+    </div>
+    </div>
+    <figure class="console panel" aria-label="Illustration of an agent run passing through the approval gate">
+      <div class="console-bar"><span></span><span></span><span></span><em>agent run · illustration</em></div>
+      <ol class="console-lines">
+        <li><b>goal</b> "every Monday, move overdue tasks to Blocked"</li>
+        <li class="ok">grounded against live data: 12 overdue tasks found</li>
+        <li class="ok">plan built by code: 3 steps, ids assigned, no guesses</li>
+        <li class="ok">read tools run freely</li>
+        <li class="hold">update_task ×12 → Suggest Only → waiting for a human</li>
+        <li class="ok">approved → stored arguments run once, ledger written</li>
+        <li class="block">delete_project → not mapped → blocked, no lookup</li>
+        <li class="done">status <b>completed</b> · 12 writes · 0 duplicates</li>
+      </ol>
+    </figure>
     </div>
 
     <h2 class="results-title">Three measured results</h2>
