@@ -3,11 +3,15 @@
 Personal site for Tayyab Bilal. Plain HTML, CSS and a small vanilla JS file. No framework, no build step.
 
 ```
-index.html          the whole page
-assets/style.css    styles (dark only)
-assets/main.js      copy button + approval-gate demo
-assets/*.svg        favicon and the four case-study diagrams
-tests/gate-check.js checks the demo follows the agent-guardrails rules
+index.html          the main page
+work.html           work-with-me page for freelance clients
+assets/style.css    styles (dark default, light mode)
+assets/main.js      theme toggle, copy button, approval-gate demo
+assets/pet.js       Bolt, the cursor-following pet and its ask-me chat
+assets/og.png       link preview image
+cv.pdf              CV download
+worker/             optional Cloudflare Worker for Bolt's AI mode
+tests/              node tests/gate-check.js, node tests/bolt-grep.js
 ```
 
 ## Preview locally
@@ -36,13 +40,8 @@ node tests/gate-check.js
 3. In the repo: Settings, Pages, Source "Deploy from a branch", branch `main`, folder `/ (root)`.
 4. After a minute the site is live at https://tayyab-bilal.github.io/.
 
-## Diagrams
-
-The SVGs are rendered with mermaid-cli (dark theme, Yaru blue colours) from the Mermaid diagrams in each repo's README. The approval-gate, agent-kit and three-hook diagrams are drawn top to bottom so they stay readable; the approval-gate and run-state ones are condensed versions.
-
 ## TODO
 
-- [ ] Add `cv.pdf` to the root of this folder. The CV button links to it and is broken until then.
 - [ ] Replace the LinkedIn activity link in the Writing section with the direct URL of the grep-first post (26 Oct 2026).
-- [ ] Optional: an Open Graph preview image (`og:image`, 1200x630 PNG).
+- [ ] Optional: Bolt AI mode. Deploy worker/bolt-worker.js with a GROQ_API_KEY secret and put its URL in the bolt-api meta tag.
 - [ ] Optional: custom domain. Add a `CNAME` file with the domain and set the DNS records GitHub Pages lists.

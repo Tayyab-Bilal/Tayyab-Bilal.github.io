@@ -79,12 +79,12 @@
       <li class="result panel hud">
         <span class="big">~77% cheaper</span>
         <p>Planner about 77% cheaper after a model switch, with 24/24 benchmark and 20/20 end-to-end runs passing.</p>
-        <span class="src">Autonomous planner, SWSAM. Pattern: <a href="https://github.com/Tayyab-Bilal/autonomous-agent">autonomous-agent</a></span>
+        <span class="src">Autonomous planner, SWSAM.</span>
       </li>
       <li class="result panel hud">
         <span class="big">1 to 2 min &rarr; ~16 s</span>
         <p>Grep-first search: finding the right record went from 1 to 2 minutes to about 16 seconds.</p>
-        <span class="src">Discovery agent, SWSAM. <a href="https://github.com/Tayyab-Bilal/grep-first-agent">grep-first-agent</a> and <a href="#writing">the post</a></span>
+        <span class="src">Discovery agent, SWSAM. <a href="#writing">Read the post</a></span>
       </li>
       <li class="result panel hud">
         <span class="big">~80% lower inference cost</span>
@@ -143,17 +143,17 @@
       <li><a href="#writing"><span class="badge live">In production</span><b>Grep-first discovery agent</b><span class="num">1 to 2 min &rarr; ~16 s</span></a></li>
       <li><a href="#case-kit"><span class="badge pre">Built, pre-release</span><b>Agent kit</b><span class="num">114 attacks, 7 holes closed</span></a></li>
       <li><a href="#experience"><span class="badge live">Shipped</span><b>Qwen 7B serving, Transdata</b><span class="num">~80% lower inference cost</span></a></li>
-      <li><a href="#case-rag"><span class="badge oss">Design + open source</span><b>Three-Hook RAG evaluation</b><span class="num">CI gate, 165 tests</span></a></li>
+      <li><a href="#case-rag"><span class="badge oss">Design</span><b>Three-Hook RAG evaluation</b><span class="num">Four dimensions, three hooks</span></a></li>
     </ul>
     <h3 class="sub-h">Case studies</h3>
-    <p class="lede">Four systems from my work at SWSAM, on an AI workspace platform for a client. That code belongs to the company, so each case links to a public version I wrote from scratch to show the same patterns. The public repos use fictional data and fake models, so their tests run offline.</p>
+    <p class="lede">Four systems from my work at SWSAM, an AI workspace platform for a client. Described at the level of design and results. The code belongs to the company and is not shared here.</p>
 
     <article class="case panel hud" id="case-gate">
       <header>
         <p class="kicker">Case 1 · Human-in-the-loop</p>
         <h3>An approval gate between the agent and every write</h3>
         <p class="plain">In plain terms: the AI can only change company data when that company's settings allow it, and a person can approve each change before it happens.</p>
-        <p class="outcome"><strong>Outcome:</strong> All 31 write tools go through one checkpoint, and a CI test fails if a new write tool is not classified. Public version: 95 tests.</p>
+        <p class="outcome"><strong>Outcome:</strong> All 31 write tools go through one checkpoint, and a CI test fails if a new write tool is not classified.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
@@ -162,7 +162,7 @@
           <dt>My role</dt>
           <dd>Designed and built it, and shipped it in five phases. The model proposes, code decides.</dd>
           <dt>Stack</dt>
-          <dd>Python, LangChain and LangGraph tools, PostgreSQL, CloudEvents. Public version: SQLite.</dd>
+          <dd>Python, LangChain and LangGraph tools, PostgreSQL, CloudEvents.</dd>
           <dt>How it works</dt>
           <dd><details><summary>Show the details</summary><ul>
             <li>A fixed map ties each write tool to one permission action. Unmapped tools are refused before any lookup, and delete tools are denied on purpose.</li>
@@ -174,10 +174,9 @@
         </dl>
         <figure class="strip-fig">
           <ol class="strip"><li>Agent proposes a write</li><li>Is the tool mapped? No: blocked, no lookup</li><li>Load the org setting fresh</li><li>Run once · Hold for a human · Block</li></ol>
-          <a class="fulldiag" href="assets/approval-gate.svg">Open the full diagram &#8599;</a>
         </figure>
       </div>
-      <a class="readcode" href="https://github.com/Tayyab-Bilal/agent-guardrails">Read the code: agent-guardrails</a> · <a href="#demo">Try the gate below</a>
+      <a class="readcode" href="#demo">Try a simplified gate below</a>
     </article>
 
     <article class="case panel hud" id="case-kit">
@@ -185,7 +184,7 @@
         <p class="kicker">Case 2 · Prompt-injection defence</p>
         <h3>A runtime where safety lives in code, not in the prompt</h3>
         <p class="plain">In plain terms: even when a document tries to trick the AI, the code, not the AI, decides what it is allowed to do.</p>
-        <p class="outcome"><strong>Outcome:</strong> A 114-attack suite closed 7 prompt-injection holes. 17/17 parity with the old workflow builder, up from 12/17. Public version: 184 tests, 20 of them attacks.</p>
+        <p class="outcome"><strong>Outcome:</strong> A 114-attack suite closed 7 prompt-injection holes. 17/17 parity with the old workflow builder, up from 12/17.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
@@ -206,10 +205,8 @@
         </dl>
         <figure class="strip-fig">
           <ol class="strip"><li>Orchestrator hands the task to a runner</li><li>Runner works inside an allow-list and budgets</li><li>Writes go through a guard, risky ones wait for a clear yes</li><li>Only the stored arguments run</li></ol>
-          <a class="fulldiag" href="assets/agent-kit.svg">Open the full diagram &#8599;</a>
         </figure>
       </div>
-      <a class="readcode" href="https://github.com/Tayyab-Bilal/agent-kit">Read the code: agent-kit</a>
     </article>
 
     <article class="case panel hud" id="case-auto">
@@ -217,12 +214,12 @@
         <p class="kicker">Case 3 · Autonomous agent</p>
         <h3>A planner and executor that run with nobody watching</h3>
         <p class="plain">In plain terms: a user describes a recurring job in one sentence, and the agent plans it and runs it on its own, safely.</p>
-        <p class="outcome"><strong>Outcome:</strong> Planner about 77% cheaper, with 24/24 benchmark and 20/20 end-to-end runs passing after the switch. I analysed 320 QA runs (92% completed) and fed the findings into a hardening list. Public version: 148 tests.</p>
+        <p class="outcome"><strong>Outcome:</strong> Planner about 77% cheaper, with 24/24 benchmark and 20/20 end-to-end runs passing after the switch. I analysed 320 QA runs (92% completed) and fed the findings into a hardening list.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
           <dt>Problem</dt>
-          <dd>Users want to say "every Monday, chase overdue tasks in Apollo" and walk away. If the model writes an id or a schedule, one made-up value becomes a real write with nobody there to stop it.</dd>
+          <dd>Users want to say "every Monday, chase overdue tasks in the project tracker" and walk away. If the model writes an id or a schedule, one made-up value becomes a real write with nobody there to stop it.</dd>
           <dt>My role</dt>
           <dd>Designed and built the planner and executor end to end, from client discovery to QA handover.</dd>
           <dt>Stack</dt>
@@ -236,14 +233,10 @@
           <dt>Trade-off and what failed</dt>
           <dd><details><summary>Show what failed and why</summary><p>The planner was quietly running on the platform's default model, because the service was never registered for model selection. I fixed the routing and moved it to a cheaper model. Each planning call got about 55% slower, which is fine because planning runs in the background.</p></details></dd>
         </dl>
-        <figure>
-          <a class="diagram" href="assets/autonomous-agent.svg" aria-label="Open the run state diagram full size">
-            <img src="assets/autonomous-agent.svg" width="768" height="371" style="max-width:620px" loading="lazy" alt="Run states: pending moves to running on an atomic claim. Running ends completed or failed, waits in awaiting_approval when the gate holds, or is parked on budget, transient failure, loop, crash, cancel or the reaper. A human decision or a resume returns it to running, and the ledger skips writes already done.">
-          </a>
-          <figcaption>Run states, redrawn from the autonomous-agent README. Click to enlarge.</figcaption>
+        <figure class="strip-fig">
+          <ol class="strip"><li>Claim the run atomically, one owner only</li><li>Run steps with turn and write budgets</li><li>Hold at the approval gate, park on any failure</li><li>Resume skips writes already done</li></ol>
         </figure>
       </div>
-      <a class="readcode" href="https://github.com/Tayyab-Bilal/autonomous-agent">Read the code: autonomous-agent</a>
     </article>
 
     <article class="case panel hud" id="case-rag">
@@ -251,14 +244,14 @@
         <p class="kicker">Case 4 · RAG evaluation</p>
         <h3>The Three-Hook Model: each check runs where its cost fits</h3>
         <p class="plain">In plain terms: automatic checks that catch it when an AI search-and-answer system starts giving worse answers.</p>
-        <p class="outcome"><strong>Outcome:</strong> A CI gate that cannot switch itself off: an unmeasured threshold or a typo in the threshold file fails. Public version: 165 tests.</p>
+        <p class="outcome"><strong>Outcome:</strong> A CI gate that cannot switch itself off: an unmeasured threshold or a typo in the threshold file fails.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
           <dt>Problem</dt>
           <dd>One averaged score hides what went wrong. Retrieval can drift slowly, a judge on every query costs too much, and nothing stops a bad change from merging.</dd>
           <dt>My role</dt>
-          <dd>Designed the evaluation framework: four dimensions and three hooks. I planned the production pipeline with two teammates and reviewed the first version. The public repo is my own implementation of the design.</dd>
+          <dd>Designed the evaluation framework: four dimensions and three hooks. I planned the production pipeline with two teammates and reviewed the first version.</dd>
           <dt>Stack</dt>
           <dd>Python, FastAPI, SQLite, Anthropic and OpenAI judge adapters, GitHub Actions.</dd>
           <dt>How it works</dt>
@@ -272,10 +265,8 @@
         </dl>
         <figure class="strip-fig">
           <ol class="strip"><li>Hook 1 · every query: cheap stats, no LLM</li><li>Hook 2 · a sample, after the answer is sent: judged in the background</li><li>Hook 3 · every PR: golden set must not get worse</li></ol>
-          <a class="fulldiag" href="assets/rag-three-hooks.svg">Open the full diagram &#8599;</a>
         </figure>
       </div>
-      <a class="readcode" href="https://github.com/Tayyab-Bilal/rag-quality-monitor">Read the code: rag-quality-monitor</a>
     </article>
   </div>
 </section>
@@ -283,7 +274,7 @@
 <section id="demo">
   <div class="wrap">
     <h2>Try the approval gate</h2>
-    <p class="lede">This runs in your browser. No network and no API key. It follows the same rules as <code>resolver.py</code> and <code>gatekeeper.py</code> in agent-guardrails. Pick a tool the model wants to call and the mode your organisation set.</p>
+    <p class="lede">A simplified approval gate that runs in your browser, with no network and no API key. Pick a tool the model wants to call and the mode an organisation has set.</p>
     <div class="demo panel hud">
       <form id="gate-form" onsubmit="return false">
         <fieldset>
@@ -322,9 +313,29 @@
 
 <section id="oss">
   <div class="wrap">
-    <h2>More open source</h2>
-    <p class="lede">Six more public repos, each a small tested version of something I built at work. Test counts are from running each suite.</p>
+    <h2>Open source</h2>
+    <p class="lede">Libraries and reference implementations I maintain in the open. Test counts are from running each suite.</p>
     <ul class="repos">
+      <li class="repo panel hud">
+        <h3>agent-guardrails</h3>
+        <p>A permission layer for agent tools: per-action modes, human approval drafts and a write ledger so retries never run twice.</p>
+        <div class="meta"><span class="mono">95 tests</span><a href="https://github.com/Tayyab-Bilal/agent-guardrails">GitHub</a></div>
+      </li>
+      <li class="repo panel hud">
+        <h3>agent-kit</h3>
+        <p>A small runtime for specialist agents with typed cards, budgets, a confirm gate and an attack test suite.</p>
+        <div class="meta"><span class="mono">184 tests</span><a href="https://github.com/Tayyab-Bilal/agent-kit">GitHub</a></div>
+      </li>
+      <li class="repo panel hud">
+        <h3>autonomous-agent</h3>
+        <p>A planner and executor for scheduled agent runs, with atomic claims, budgets and resumable runs.</p>
+        <div class="meta"><span class="mono">148 tests</span><a href="https://github.com/Tayyab-Bilal/autonomous-agent">GitHub</a></div>
+      </li>
+      <li class="repo panel hud">
+        <h3>rag-quality-monitor</h3>
+        <p>Quality checks for retrieval-augmented generation: cheap stats per query, sampled judging and a CI golden set.</p>
+        <div class="meta"><span class="mono">165 tests</span><a href="https://github.com/Tayyab-Bilal/rag-quality-monitor">GitHub</a></div>
+      </li>
       <li class="repo panel hud">
         <h3>grep-first-agent</h3>
         <p>A scout agent that turns vague requests like "the Q4 task" into exact record ids by searching live data with string matching, not vector search.</p>

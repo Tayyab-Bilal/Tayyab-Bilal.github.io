@@ -1,5 +1,4 @@
-// Mirrors agent-guardrails: resolver.py (TOOL_ACTIONS, ALLOWED_UNGATED, READ_TOOLS, mode_for)
-// and gatekeeper.py guard(). Pure function, no network.
+// A simplified approval gate for the demo. Pure function, no network.
 var TOOL_ACTIONS = {
   create_task: ["Tasks", "Create Task"],
   update_task: ["Tasks", "Update Task"],
