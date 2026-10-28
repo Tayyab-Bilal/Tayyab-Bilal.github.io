@@ -68,6 +68,17 @@ if (typeof module !== "undefined") module.exports = { decide: decide };
 
 if (typeof document !== "undefined") {
 
+  // Theme toggle: system setting by default, the choice is remembered per browser.
+  var root = document.documentElement, themeBtn = document.getElementById("theme-toggle");
+  function current() { return root.dataset.theme || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"); }
+  function label() { themeBtn.textContent = current() === "light" ? "Dark mode" : "Light mode"; }
+  themeBtn.addEventListener("click", function () {
+    root.dataset.theme = current() === "light" ? "dark" : "light";
+    try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+    label();
+  });
+  label();
+
   // Copy email.
   var copyBtn = document.getElementById("copy-email");
   var copyStatus = document.getElementById("copy-status");

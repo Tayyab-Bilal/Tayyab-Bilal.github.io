@@ -1,12 +1,12 @@
-/* Dark only. True greys plus one Yaru blue accent family. */
+/* Dark by default (soft charcoal), light mode via toggle or system setting. One Yaru blue accent family. */
 :root {
-  --bg: #050505;
-  --surface: rgba(30, 30, 30, .72);
-  --surface-solid: #161616;
-  --surface-2: #1e1e1e;
-  --surface-3: #242424;
-  --line: #2e2e2e;
-  --line-2: #3a3a3a;
+  --bg: #121316;
+  --surface: rgba(32, 34, 40, .78);
+  --surface-solid: #1a1c21;
+  --surface-2: #22252b;
+  --surface-3: #2a2d34;
+  --line: #30333b;
+  --line-2: #3e424b;
   --text: #e6e6e6;
   --text-2: #a8a8a8;
   --white: #ffffff;
@@ -15,12 +15,28 @@
   --blue-deep: #1a5fb4;
   --glow: rgba(53, 132, 228, .35);
   --amber: #e5a50a;
-  --grid: rgba(255, 255, 255, .025);
+  --grid: rgba(255, 255, 255, .03);
+  --link: #62a0ea;
+  --dock-bg: rgba(30, 32, 38, .72);
   --display: "Anton", "Oswald", Impact, "Arial Narrow", sans-serif;
   --sans: "Ubuntu Sans", "Ubuntu", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Ubuntu Sans Mono", "Ubuntu Mono", ui-monospace, Menlo, monospace;
   --dock-h: 52px;
   color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #f5f6f8; --surface: rgba(255, 255, 255, .9); --surface-solid: #ffffff; --surface-2: #eef0f3; --surface-3: #e3e6ea;
+  --line: #dadde2; --line-2: #c4c8cf; --text: #1c1e23; --text-2: #4d525c; --white: #0d0f13;
+  --glow: rgba(26, 95, 180, .18); --amber: #9a6700; --grid: rgba(0, 0, 0, .035); --link: #1a5fb4; --dock-bg: rgba(255, 255, 255, .82);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f5f6f8; --surface: rgba(255, 255, 255, .9); --surface-solid: #ffffff; --surface-2: #eef0f3; --surface-3: #e3e6ea;
+    --line: #dadde2; --line-2: #c4c8cf; --text: #1c1e23; --text-2: #4d525c; --white: #0d0f13;
+    --glow: rgba(26, 95, 180, .18); --amber: #9a6700; --grid: rgba(0, 0, 0, .035); --link: #1a5fb4; --dock-bg: rgba(255, 255, 255, .82);
+    color-scheme: light;
+  }
 }
 
 * { box-sizing: border-box; }
@@ -31,7 +47,7 @@ body {
   font: 16px/1.65 var(--sans); overflow-wrap: break-word;
   padding-bottom: calc(var(--dock-h) + 40px + env(safe-area-inset-bottom));
 }
-a { color: var(--blue-light); text-underline-offset: 3px; }
+a { color: var(--link); text-underline-offset: 3px; }
 a:hover { text-decoration-thickness: 2px; }
 :focus-visible { outline: 2px solid var(--blue-light); outline-offset: 3px; border-radius: 3px; box-shadow: 0 0 0 5px var(--glow); }
 img { max-width: 100%; height: auto; display: block; }
@@ -44,9 +60,8 @@ code, .mono { font-family: var(--mono); font-size: .92em; }
 .skip:focus { left: 8px; }
 
 h1, h2, h3 { margin: 0; line-height: 1.1; }
-h1, h2 { font-family: var(--display); font-weight: 400; text-transform: uppercase; letter-spacing: .02em; }
-h1 { font-size: clamp(3rem, 10vw, 5.6rem); line-height: .95; color: var(--white); }
-h2 { font-size: clamp(2rem, 5vw, 2.7rem); margin-bottom: 10px; }
+h1 { font-family: var(--display); font-weight: 400; text-transform: uppercase; letter-spacing: .02em; font-size: clamp(2.8rem, 8vw, 4.6rem); line-height: .95; color: var(--white); }
+h2 { font-family: var(--sans); font-weight: 600; font-size: clamp(1.6rem, 4vw, 2.1rem); letter-spacing: -.01em; margin-bottom: 10px; color: var(--white); }
 h3 { font-family: var(--sans); font-weight: 600; font-size: 1.2rem; }
 .label-mono, .kicker, legend, dl.report dt, .results-title {
   font-family: var(--mono); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--text-2); font-weight: 400;
@@ -67,7 +82,13 @@ section + section::before {
   background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
   background-size: 40px 40px;
 }
-.hero .eyebrow { margin: 0 0 14px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 0 14px; }
+.hero .eyebrow { margin: 0; }
+.theme-toggle { font: .8rem var(--mono); color: var(--text-2); background: transparent; border: 1px solid var(--line-2); border-radius: 6px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
+.theme-toggle:hover { color: var(--text); background: var(--surface-2); }
+.hero .history { color: var(--text-2); font-size: .95rem; margin: 0 0 20px; }
+.hero .history strong { color: var(--text); font-weight: 600; }
+.case .plain { margin: 8px 0 0; color: var(--text); font-size: 1.02rem; max-width: 70ch; border-left: 3px solid var(--blue); padding-left: 12px; }
 .hero .role { font-size: clamp(1.15rem, 2.6vw, 1.45rem); font-weight: 500; margin: 16px 0 8px; max-width: 34ch; }
 .hero .sub { color: var(--text-2); max-width: 62ch; margin: 0 0 22px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0 0 24px; }
@@ -78,14 +99,14 @@ section + section::before {
   border: 1px solid var(--line-2); color: var(--text); background: var(--surface-2); cursor: pointer; font: 500 1rem var(--sans);
 }
 .btn:hover { background: var(--surface-3); }
-.btn.primary { background: var(--blue); color: var(--white); border-color: var(--blue); }
-.btn.primary:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
+.btn.primary { background: var(--blue-deep); color: #fff; border-color: var(--blue-deep); }
+.btn.primary:hover { background: #164f97; border-color: #164f97; }
 
 .results-title { margin: 44px 0 12px; }
 .results { display: grid; gap: 14px; list-style: none; padding: 0; margin: 0; }
 @media (min-width: 820px) { .results { grid-template-columns: repeat(3, 1fr); } }
 .result { display: flex; flex-direction: column; padding: 18px 20px; }
-.result .big { font-family: var(--display); font-size: 2.3rem; line-height: 1.05; color: var(--white); text-transform: uppercase; text-shadow: 0 0 24px var(--glow); }
+.result .big { font-family: var(--sans); font-weight: 700; font-size: 1.75rem; line-height: 1.15; color: var(--white); letter-spacing: -.01em; }
 .result p { margin: 8px 0 12px; }
 .result .src { margin-top: auto; font-size: .86rem; color: var(--text-2); }
 
@@ -108,21 +129,6 @@ section + section::before {
 .hud:hover::after, .hud:focus-within::after { bottom: -3px; right: -3px; opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .hud::before, .hud::after { transition: none; } }
 
-/* Materialise on scroll, CSS only. Browsers without scroll timelines just show the panels. */
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .hud {
-      background-image: linear-gradient(180deg, transparent 44%, rgba(98, 160, 234, .18) 50%, transparent 56%);
-      background-repeat: no-repeat; background-size: 100% 200%;
-      animation: materialise linear both; animation-timeline: view(); animation-range: entry 0% entry 60%;
-    }
-    @keyframes materialise {
-      from { opacity: 0; transform: translateY(12px); background-position: 0 -100%; }
-      to { opacity: 1; transform: none; background-position: 0 200%; }
-    }
-  }
-}
-
 /* Case studies */
 .case { padding: 20px; margin-bottom: 28px; }
 @media (min-width: 720px) { .case { padding: 32px; } }
@@ -138,7 +144,7 @@ dl.report dd { margin: 0 0 10px; }
 dl.report ul { margin: 0; padding-left: 18px; }
 dl.report li + li { margin-top: 4px; }
 figure { margin: 0; }
-.diagram { display: block; background: var(--surface-solid); border: 1px solid var(--line); border-radius: 6px; padding: 14px; }
+.diagram { display: block; background: #161616; border: 1px solid var(--line); border-radius: 6px; padding: 14px; }
 .diagram:hover { border-color: var(--blue-deep); }
 .diagram img { margin: 0 auto; width: 100%; }
 figcaption { font-size: .82rem; color: var(--text-2); margin-top: 8px; font-family: var(--mono); }
@@ -166,10 +172,10 @@ legend { margin-bottom: 10px; }
   font-family: var(--mono); font-size: .88rem; background: var(--surface-2); color: var(--text);
 }
 .opts span:hover { background: var(--surface-3); }
-.opts input:checked + span { background: var(--blue); border-color: var(--blue); color: var(--white); }
+.opts input:checked + span { background: var(--blue-deep); border-color: var(--blue-deep); color: #fff; }
 .opts input:focus-visible + span { outline: 2px solid var(--blue-light); outline-offset: 3px; }
 .verdict { border-left: 3px solid var(--blue-light); padding: 2px 0 2px 16px; }
-.verdict .label { font-family: var(--display); font-size: 2rem; text-transform: uppercase; letter-spacing: .02em; line-height: 1.1; color: var(--white); }
+.verdict .label { font-family: var(--sans); font-weight: 700; font-size: 1.6rem; line-height: 1.2; color: var(--white); }
 .verdict[data-kind="run"] .label { text-shadow: 0 0 18px var(--glow); }
 .verdict[data-kind="hold"] { border-left-style: dashed; }
 .verdict[data-kind="block"] { border-color: var(--amber); } .verdict[data-kind="block"] .label { color: var(--amber); }
@@ -207,23 +213,23 @@ footer { padding: 28px 0 8px; color: var(--text-2); font-size: .85rem; font-fami
   position: fixed; left: 50%; transform: translateX(-50%); z-index: 20;
   bottom: calc(12px + env(safe-area-inset-bottom));
   display: flex; gap: 2px; padding: 6px; max-width: calc(100vw - 24px);
-  background: rgba(30, 30, 30, .67); border: 1px solid rgba(255, 255, 255, .08); border-radius: 14px;
+  background: var(--dock-bg); border: 1px solid var(--line); border-radius: 14px;
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
 }
 .dock a {
   display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border-radius: 9px;
   color: var(--text); text-decoration: none; font: .85rem var(--mono); white-space: nowrap;
 }
-.dock a:hover { background: rgba(255, 255, 255, .08); }
+.dock a:hover { background: var(--surface-3); }
 .dock svg { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 @media (max-width: 559px) {
   .dock a { padding: 0 11px; }
   .dock a span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 
-/* Small screens: diagrams scroll sideways inside their panel instead of shrinking to unreadable. */
+/* Small screens: diagrams fit the panel; tap opens the full-size SVG. */
 @media (max-width: 719px) {
-  .diagram { overflow-x: auto; }
-  .diagram img { min-width: 620px; }
+  .diagram { padding: 8px; }
+  .diagram img { max-width: 100% !important; }
 }

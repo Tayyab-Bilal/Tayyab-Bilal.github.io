@@ -9,8 +9,12 @@
 <meta property="og:title" content="Tayyab Bilal, Senior AI Engineer">
 <meta property="og:description" content="I build agents that act on real systems, safely. 5 years, 10 open-source repos, 1,100+ passing tests.">
 <meta property="og:url" content="https://tayyab-bilal.github.io/">
-<meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#050505">
+<meta property="og:image" content="https://tayyab-bilal.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#121316">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +26,7 @@
 <main id="main">
 <section class="hero" id="top">
   <div class="wrap">
-    <p class="eyebrow label-mono">Lahore, Pakistan · Senior AI Engineer</p>
+    <div class="topbar"><p class="eyebrow label-mono">Lahore, Pakistan (UTC+5) · Open to remote</p><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch light or dark theme">Light mode</button></div>
     <h1>Tayyab Bilal</h1>
     <p class="role">Senior AI Engineer. I build agents that act on real systems, safely.</p>
     <p class="sub">5 years in ML and AI, about 4 of them building agents: Rasa state machines first, then hand-written ReAct loops, now LangGraph. My focus is the part around the model: permissions, approvals, budgets, retries and evaluation.</p>
@@ -31,13 +35,15 @@
       <li>10 open-source repos</li>
       <li>1,100+ passing tests</li>
     </ul>
+    <p class="history"><strong>Now:</strong> Senior AI Engineer, SWSAM Solutions · <strong>Before:</strong> Senior ML Engineer, Transdata · ML Engineer, Quid Sol</p>
     <div class="btns">
-      <a class="btn primary" href="https://github.com/Tayyab-Bilal">GitHub</a>
+      <a class="btn primary" href="mailto:tayyaib055766@gmail.com">Email me</a>
+      <a class="btn" href="https://github.com/Tayyab-Bilal">GitHub</a>
       <a class="btn" href="https://www.linkedin.com/in/tayyab-bilal-79b509187/">LinkedIn</a>
       <!-- CV button: add cv.pdf to the site root, then restore: <a class="btn" href="cv.pdf">CV</a> -->
     </div>
 
-    <h2 class="results-title">SYS // Three measured results</h2>
+    <h2 class="results-title">Three measured results</h2>
     <ul class="results">
       <li class="result panel hud">
         <span class="big">~77% cheaper</span>
@@ -52,7 +58,42 @@
       <li class="result panel hud">
         <span class="big">114 attacks, 7 holes closed</span>
         <p>Prompt-injection test suite of 114 attacks that closed 7 holes in an agent runtime I built.</p>
-        <span class="src">Agent kit, SWSAM (built, not shipped yet). Public version: <a href="https://github.com/Tayyab-Bilal/agent-kit">agent-kit</a></span>
+        <span class="src">Agent kit, SWSAM (pre-release). Public version: <a href="https://github.com/Tayyab-Bilal/agent-kit">agent-kit</a></span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="wrap">
+    <h2>Experience</h2>
+    <ul class="jobs">
+      <li class="job">
+        <span class="when">Apr 2026 to now</span>
+        <div>
+          <h3>Senior AI Engineer, SWSAM Solutions</h3>
+          <p>AI workspace platform for a client, in production in early release with about 300 users. Led 3 engineers. Top contributor to the AI service. Built the autonomous planner and executor, the approval gate, the discovery agent and AI credit metering. Primary code reviewer.</p>
+        </div>
+      </li>
+      <li class="job">
+        <span class="when">Nov 2024 to Apr 2026</span>
+        <div>
+          <h3>Senior Machine Learning Engineer, Transdata</h3>
+          <p>Conversational AI and reporting systems for enterprise clients. Split an agent proof of concept into microservices. Cut inference cost about 80% by serving a 4-bit QLoRA Qwen 7B model.</p>
+        </div>
+      </li>
+      <li class="job">
+        <span class="when">Feb 2022 to Sep 2024</span>
+        <div>
+          <h3>Machine Learning Engineer, Quid Sol</h3>
+          <p>ML apps and chatbots for healthcare, e-commerce and fintech clients. Built Rasa assistants, then ReAct agents by hand with plain Python loops before agent frameworks existed.</p>
+        </div>
+      </li>
+      <li class="job">
+        <span class="when">Tools I use</span>
+        <div>
+          <p>Python, FastAPI, LangGraph, LangChain, PostgreSQL, Redis, Qdrant, pytest, GitHub Actions. For coding: Claude Code, Codex, OpenCode, a DeepSeek harness, T3 Code and local Ollama models.</p>
+        </div>
       </li>
     </ul>
   </div>
@@ -65,8 +106,9 @@
 
     <article class="case panel hud" id="case-gate">
       <header>
-        <p class="kicker">SYS // CASE_01 · Human-in-the-loop</p>
+        <p class="kicker">Case 1 · Human-in-the-loop</p>
         <h3>An approval gate between the agent and every write</h3>
+        <p class="plain">In plain terms: the AI can only change company data when that company's settings allow it, and a person can approve each change before it happens.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
@@ -99,8 +141,9 @@
 
     <article class="case panel hud" id="case-kit">
       <header>
-        <p class="kicker">SYS // CASE_02 · Prompt-injection defence</p>
+        <p class="kicker">Case 2 · Prompt-injection defence</p>
         <h3>A runtime where safety lives in code, not in the prompt</h3>
+        <p class="plain">In plain terms: even when a document tries to trick the AI, the code, not the AI, decides what it is allowed to do.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
@@ -133,8 +176,9 @@
 
     <article class="case panel hud" id="case-auto">
       <header>
-        <p class="kicker">SYS // CASE_03 · Autonomous agent</p>
+        <p class="kicker">Case 3 · Autonomous agent</p>
         <h3>A planner and executor that run with nobody watching</h3>
+        <p class="plain">In plain terms: a user describes a recurring job in one sentence, and the agent plans it and runs it on its own, safely.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
@@ -167,8 +211,9 @@
 
     <article class="case panel hud" id="case-rag">
       <header>
-        <p class="kicker">SYS // CASE_04 · RAG evaluation</p>
+        <p class="kicker">Case 4 · RAG evaluation</p>
         <h3>The Three-Hook Model: each check runs where its cost fits</h3>
+        <p class="plain">In plain terms: automatic checks that catch it when an AI search-and-answer system starts giving worse answers.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
@@ -292,41 +337,6 @@
   </div>
 </section>
 
-<section id="experience">
-  <div class="wrap">
-    <h2>Experience</h2>
-    <ul class="jobs">
-      <li class="job">
-        <span class="when">Apr 2026 to now</span>
-        <div>
-          <h3>Senior AI Engineer, SWSAM Solutions</h3>
-          <p>AI workspace platform for a client, in production in early release with about 300 users. Led 3 engineers. Top contributor to the AI service. Built the autonomous planner and executor, the approval gate, the discovery agent and AI credit metering. Primary code reviewer.</p>
-        </div>
-      </li>
-      <li class="job">
-        <span class="when">Nov 2024 to Apr 2026</span>
-        <div>
-          <h3>Senior Machine Learning Engineer, Transdata</h3>
-          <p>Conversational AI and reporting systems for enterprise clients. Split an agent proof of concept into microservices. Cut inference cost about 80% by serving a 4-bit QLoRA Qwen 7B model.</p>
-        </div>
-      </li>
-      <li class="job">
-        <span class="when">Feb 2022 to Sep 2024</span>
-        <div>
-          <h3>Machine Learning Engineer, Quid Sol</h3>
-          <p>ML apps and chatbots for healthcare, e-commerce and fintech clients. Built Rasa assistants, then ReAct agents by hand with plain Python loops before agent frameworks existed.</p>
-        </div>
-      </li>
-      <li class="job">
-        <span class="when">Tools I use</span>
-        <div>
-          <p>Python, FastAPI, LangGraph, LangChain, PostgreSQL, Redis, Qdrant, pytest, GitHub Actions. For coding: Claude Code, Codex, OpenCode, a DeepSeek harness, T3 Code and local Ollama models.</p>
-        </div>
-      </li>
-    </ul>
-  </div>
-</section>
-
 <section id="contact">
   <div class="wrap">
     <h2>Contact</h2>
@@ -350,10 +360,10 @@
 </footer>
 <nav class="dock" aria-label="Sections">
   <a href="#top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a>
+  <a href="#experience"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Experience</span></a>
   <a href="#work"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>Work</span></a>
   <a href="#demo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M12 15h5"/></svg><span>Demo</span></a>
   <a href="#oss"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg><span>Code</span></a>
-  <a href="#experience"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Experience</span></a>
   <a href="#contact"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Contact</span></a>
 </nav>
 
