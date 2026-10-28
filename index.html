@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tayyab Bilal, Senior AI Engineer</title>
+<meta name="description" content="Tayyab Bilal, Senior AI Engineer in Lahore. I build agents that act on real systems, safely. Case studies, open-source code and a live approval-gate demo.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tayyab Bilal, Senior AI Engineer">
+<meta property="og:description" content="I build agents that act on real systems, safely. 5 years, 10 open-source repos, 1,100+ passing tests.">
+<meta property="og:url" content="https://tayyab-bilal.github.io/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#050505">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Ubuntu+Sans:wght@400;500;600&family=Ubuntu+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<main id="main">
+<section class="hero" id="top">
+  <div class="wrap">
+    <p class="eyebrow label-mono">Lahore, Pakistan · Senior AI Engineer</p>
+    <h1>Tayyab Bilal</h1>
+    <p class="role">Senior AI Engineer. I build agents that act on real systems, safely.</p>
+    <p class="sub">5 years in ML and AI, about 4 of them building agents: Rasa state machines first, then hand-written ReAct loops, now LangGraph. My focus is the part around the model: permissions, approvals, budgets, retries and evaluation.</p>
+    <ul class="chips" aria-label="Quick facts">
+      <li>5 years</li>
+      <li>10 open-source repos</li>
+      <li>1,100+ passing tests</li>
+    </ul>
+    <div class="btns">
+      <a class="btn primary" href="https://github.com/Tayyab-Bilal">GitHub</a>
+      <a class="btn" href="https://www.linkedin.com/in/tayyab-bilal-79b509187/">LinkedIn</a>
+      <a class="btn" href="cv.pdf">CV</a>
+    </div>
+
+    <h2 class="results-title">SYS // Three measured results</h2>
+    <ul class="results">
+      <li class="result panel hud">
+        <span class="big">~77% cheaper</span>
+        <p>Planner about 77% cheaper after a model switch, with 24/24 benchmark and 20/20 end-to-end runs passing.</p>
+        <span class="src">Autonomous planner, SWSAM. Pattern: <a href="https://github.com/Tayyab-Bilal/autonomous-agent">autonomous-agent</a></span>
+      </li>
+      <li class="result panel hud">
+        <span class="big">1 to 2 min &rarr; ~16 s</span>
+        <p>Grep-first search: finding the right record went from 1 to 2 minutes to about 16 seconds.</p>
+        <span class="src">Discovery agent, SWSAM. <a href="https://github.com/Tayyab-Bilal/grep-first-agent">grep-first-agent</a> and <a href="#writing">the post</a></span>
+      </li>
+      <li class="result panel hud">
+        <span class="big">114 attacks, 7 holes closed</span>
+        <p>Prompt-injection test suite of 114 attacks that closed 7 holes in an agent runtime I built.</p>
+        <span class="src">Agent kit, SWSAM (built, not shipped yet). Public version: <a href="https://github.com/Tayyab-Bilal/agent-kit">agent-kit</a></span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <h2>Case studies</h2>
+    <p class="lede">Four systems from my work at SWSAM, on an AI workspace platform for a client. That code belongs to the company, so each case links to a public version I wrote from scratch to show the same patterns. The public repos use fictional data and fake models, so their tests run offline.</p>
+
+    <article class="case panel hud" id="case-gate">
+      <header>
+        <p class="kicker">SYS // CASE_01 · Human-in-the-loop</p>
+        <h3>An approval gate between the agent and every write</h3>
+      </header>
+      <div class="case-grid">
+        <dl class="report">
+          <dt>Problem</dt>
+          <dd>An agent runs at 3 a.m. with nobody watching. If the model calls a delete tool, it happens on real data. Each organisation needs a per-action choice: do it, ask me first, or never. It has to hold even when the model is tricked.</dd>
+          <dt>My role</dt>
+          <dd>Designed and built it, and shipped it in five phases. The model proposes, code decides.</dd>
+          <dt>Stack</dt>
+          <dd>Python, LangChain and LangGraph tools, PostgreSQL, CloudEvents. Public version: SQLite.</dd>
+          <dt>How it works</dt>
+          <dd><ul>
+            <li>A fixed map ties each write tool to one permission action. Unmapped tools are refused before any lookup, and delete tools are denied on purpose.</li>
+            <li>The mode (Autonomous, Suggest Only, Disabled) is read fresh on every call. Suggest Only stores a draft with signed arguments, and approval replays exactly those arguments, once.</li>
+            <li>A permissions outage is retried, then the run is parked. It is never reported as "disabled".</li>
+          </ul></dd>
+          <dt>Trade-off and what failed</dt>
+          <dd>An outage used to show up as "disabled in your settings", so users went to check settings that were fine. I split unavailable, misconfigured and disabled into three answers. I also tried LangGraph <code>interrupt()</code>: nested agents without checkpointers never passed the interrupt up, so I kept durable drafts instead.</dd>
+          <dt>Outcome</dt>
+          <dd>All 31 write tools go through one checkpoint, and a CI test fails if a new write tool is not classified. Public version: 95 tests.</dd>
+        </dl>
+        <figure>
+          <a class="diagram" href="assets/approval-gate.svg" aria-label="Open the approval gate diagram full size">
+            <img src="assets/approval-gate.svg" width="1118" height="1513" style="max-width:820px" loading="lazy" alt="Flow chart: a proposed write first checks for an existing draft, where a human answer wins. Unmapped or denied tools are blocked with no lookup. Otherwise permissions load fresh: an outage parks the run as unavailable, a bad payload is misconfigured. Autonomous claims a ledger row and runs once, Suggest Only stores a signed draft for one human decision and exact replay, Disabled is blocked.">
+          </a>
+          <figcaption>One gated call, condensed from the agent-guardrails README. Click to enlarge.</figcaption>
+        </figure>
+      </div>
+      <a class="readcode" href="https://github.com/Tayyab-Bilal/agent-guardrails">Read the code: agent-guardrails</a> · <a href="#demo">Try the gate below</a>
+    </article>
+
+    <article class="case panel hud" id="case-kit">
+      <header>
+        <p class="kicker">SYS // CASE_02 · Prompt-injection defence</p>
+        <h3>A runtime where safety lives in code, not in the prompt</h3>
+      </header>
+      <div class="case-grid">
+        <dl class="report">
+          <dt>Problem</dt>
+          <dd>Specialist agents take several steps and can change data. A hostile document or a confused model can call the wrong tool, claim the user said yes, save twice or flood the prompt.</dd>
+          <dt>My role</dt>
+          <dd>Designed and built the agent kit and the side-panel workflow agent on top of it. Both are built and not shipped yet.</dd>
+          <dt>Stack</dt>
+          <dd>Python, LangGraph, YAML agent cards, SQLite, JMESPath, pytest.</dd>
+          <dt>How it works</dt>
+          <dd><ul>
+            <li>Each agent is one folder with a strict card. A write tool that is neither guarded nor confirm-gated makes the card invalid.</li>
+            <li>Risky actions are never run when the model asks. Code stores the exact arguments, writes the question itself, and waits. A fail-closed consent judge reads only that question and the user's reply. Anything but a clear yes cancels.</li>
+            <li>Big tool results go into per-task SQLite. The model queries them with SQL that a deny-by-default authorizer keeps read only.</li>
+          </ul></dd>
+          <dt>Trade-off and what failed</dt>
+          <dd>I tried a Pyodide (WASM) sandbox for the model's queries and rejected it: about 3 s cold start, about 350 MB, and no real isolation. The agent is about 2.6x slower than the old builder and uses 12 to 13x the tokens. The judge is strict, so a polite "yes, thanks" cancels.</dd>
+          <dt>Outcome</dt>
+          <dd>A 114-attack suite closed 7 prompt-injection holes. 17/17 parity with the old workflow builder, up from 12/17. Public version: 184 tests, 20 of them attacks.</dd>
+        </dl>
+        <figure>
+          <a class="diagram" href="assets/agent-kit.svg" aria-label="Open the agent kit diagram full size">
+            <img src="assets/agent-kit.svg" width="1387" height="792"  loading="lazy" alt="Flow diagram: the orchestrator delegates to a runner with a ReAct loop and budgets. The runner opens an allow-list as the user, stores big results in SQLite, routes writes through a guard with a ledger, and sends risky actions to a confirm gate. On the next turn a consent judge sees only the user's reply, and only a yes with unchanged data runs the stored arguments.">
+          </a>
+          <figcaption>The agent-kit runtime, from its README. Click to enlarge.</figcaption>
+        </figure>
+      </div>
+      <a class="readcode" href="https://github.com/Tayyab-Bilal/agent-kit">Read the code: agent-kit</a>
+    </article>
+
+    <article class="case panel hud" id="case-auto">
+      <header>
+        <p class="kicker">SYS // CASE_03 · Autonomous agent</p>
+        <h3>A planner and executor that run with nobody watching</h3>
+      </header>
+      <div class="case-grid">
+        <dl class="report">
+          <dt>Problem</dt>
+          <dd>Users want to say "every Monday, chase overdue tasks in Apollo" and walk away. If the model writes an id or a schedule, one made-up value becomes a real write with nobody there to stop it.</dd>
+          <dt>My role</dt>
+          <dd>Designed and built the planner and executor end to end, from client discovery to QA handover.</dd>
+          <dt>Stack</dt>
+          <dd>Python, FastAPI, LangChain structured output, PostgreSQL advisory locks, RRULE, CloudEvents.</dd>
+          <dt>How it works</dt>
+          <dd><ul>
+            <li>The goal is grounded against real data first. The model only extracts intent. Code assigns ids, links steps and builds the schedule, and refuses plans that cannot work.</li>
+            <li>Only one worker owns a run, through an atomic claim and a fencing token. A reaper parks runs whose worker died.</li>
+            <li>Hard limits: 90 turns, 150 writes per run, a resume cap and a loop guard. A write ledger turns a repeated write into a no-op, and the final status comes from stored step states, not the agent's words.</li>
+          </ul></dd>
+          <dt>Trade-off and what failed</dt>
+          <dd>The planner was quietly running on the platform's default model, because the service was never registered for model selection. I fixed the routing and moved it to a cheaper model. Each planning call got about 55% slower, which is fine because planning runs in the background.</dd>
+          <dt>Outcome</dt>
+          <dd>Planner about 77% cheaper, with 24/24 benchmark and 20/20 end-to-end runs passing after the switch. I analysed 320 QA runs (92% completed) and fed the findings into a hardening list. Public version: 148 tests.</dd>
+        </dl>
+        <figure>
+          <a class="diagram" href="assets/autonomous-agent.svg" aria-label="Open the run state diagram full size">
+            <img src="assets/autonomous-agent.svg" width="768" height="371" style="max-width:768px" loading="lazy" alt="Run states: pending moves to running on an atomic claim. Running ends completed or failed, waits in awaiting_approval when the gate holds, or is parked on budget, transient failure, loop, crash, cancel or the reaper. A human decision or a resume returns it to running, and the ledger skips writes already done.">
+          </a>
+          <figcaption>Run states, redrawn from the autonomous-agent README. Click to enlarge.</figcaption>
+        </figure>
+      </div>
+      <a class="readcode" href="https://github.com/Tayyab-Bilal/autonomous-agent">Read the code: autonomous-agent</a>
+    </article>
+
+    <article class="case panel hud" id="case-rag">
+      <header>
+        <p class="kicker">SYS // CASE_04 · RAG evaluation</p>
+        <h3>The Three-Hook Model: each check runs where its cost fits</h3>
+      </header>
+      <div class="case-grid">
+        <dl class="report">
+          <dt>Problem</dt>
+          <dd>One averaged score hides what went wrong. Retrieval can drift slowly, a judge on every query costs too much, and nothing stops a bad change from merging.</dd>
+          <dt>My role</dt>
+          <dd>Designed the evaluation framework: four dimensions and three hooks. I planned the production pipeline with two teammates and reviewed the first version. The public repo is my own implementation of the design.</dd>
+          <dt>Stack</dt>
+          <dd>Python, FastAPI, SQLite, Anthropic and OpenAI judge adapters, GitHub Actions.</dd>
+          <dt>How it works</dt>
+          <dd><ul>
+            <li>Hook 1, every query, no LLM: score gap, empty results and p95 latency over a rolling window.</li>
+            <li>Hook 2, a small sample of live traffic, judged in the background: claim-level faithfulness, relevance, context precision and drift.</li>
+            <li>Hook 3, every PR: a golden JSONL set, thresholds and a saved baseline. A metric that gets worse fails CI even above its threshold.</li>
+          </ul></dd>
+          <dt>Trade-off and what failed</dt>
+          <dd>In review I found that the "context" being judged was an intermediate answer, not the retrieved chunks, so the scores compared one answer with another. Hook 2 now checks that every context is a chunk the retriever really returned. A text check alone cannot catch a reworded answer.</dd>
+          <dt>Outcome</dt>
+          <dd>A CI gate that cannot switch itself off: an unmeasured threshold or a typo in the threshold file fails. Public version: 165 tests.</dd>
+        </dl>
+        <figure>
+          <a class="diagram" href="assets/rag-three-hooks.svg" aria-label="Open the three-hook diagram full size">
+            <img src="assets/rag-three-hooks.svg" width="831" height="964" style="max-width:700px" loading="lazy" alt="Flow diagram: a query goes to the retriever and generator. Hook 1 records stats on every call. Hook 2 samples answers after they are sent and checks raw chunks, then a batch judges and scores them for drift. Hook 3 runs a golden set from git through thresholds and a baseline to a CI exit code.">
+          </a>
+          <figcaption>The three hooks, from the rag-quality-monitor README. Click to enlarge.</figcaption>
+        </figure>
+      </div>
+      <a class="readcode" href="https://github.com/Tayyab-Bilal/rag-quality-monitor">Read the code: rag-quality-monitor</a>
+    </article>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <h2>Try the approval gate</h2>
+    <p class="lede">This runs in your browser. No network and no API key. It follows the same rules as <code>resolver.py</code> and <code>gatekeeper.py</code> in agent-guardrails. Pick a tool the model wants to call and the mode your organisation set.</p>
+    <div class="demo panel hud">
+      <form id="gate-form" onsubmit="return false">
+        <fieldset>
+          <legend>Tool the model proposes</legend>
+          <div class="opts">
+            <label><input type="radio" name="tool" value="update_task" checked><span>update_task</span></label>
+            <label><input type="radio" name="tool" value="create_task"><span>create_task</span></label>
+            <label><input type="radio" name="tool" value="delete_project"><span>delete_project</span></label>
+            <label><input type="radio" name="tool" value="archive_everything"><span>archive_everything (unknown)</span></label>
+            <label><input type="radio" name="tool" value="get_task"><span>get_task (read)</span></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Permission mode</legend>
+          <div class="opts">
+            <label><input type="radio" name="mode" value="auto"><span>Autonomous</span></label>
+            <label><input type="radio" name="mode" value="suggest" checked><span>Suggest Only</span></label>
+            <label><input type="radio" name="mode" value="disabled"><span>Disabled</span></label>
+            <label><input type="radio" name="mode" value="down"><span>Permissions service down</span></label>
+          </div>
+        </fieldset>
+      </form>
+      <div aria-live="polite">
+        <div class="verdict" id="verdict">
+          <div class="label">Hold for a human</div>
+          <p class="reason">Suggest Only. A draft is stored with the exact arguments.</p>
+        </div>
+        <div class="term" aria-label="Steps the gate took">
+          <ol id="trace"></ol>
+          <p class="out" id="msg" hidden></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="oss">
+  <div class="wrap">
+    <h2>More open source</h2>
+    <p class="lede">Six more public repos, each a small tested version of something I built at work. Test counts are from running each suite.</p>
+    <ul class="repos">
+      <li class="repo panel hud">
+        <h3>grep-first-agent</h3>
+        <p>A scout agent that turns vague requests like "the Q4 task" into exact record ids by searching live data with string matching, not vector search.</p>
+        <div class="meta"><span class="mono">79 tests</span><a href="https://github.com/Tayyab-Bilal/grep-first-agent">GitHub</a></div>
+      </li>
+      <li class="repo panel hud">
+        <h3>llm-cost-meter</h3>
+        <p>Measures the cost of every paid AI call and charges the right customer's credit while the answer streams. Stops cleanly when credit runs out.</p>
+        <div class="meta"><span class="mono">135 tests</span><a href="https://github.com/Tayyab-Bilal/llm-cost-meter">GitHub</a></div>
+      </li>
+      <li class="repo panel hud">
+        <h3>model-price-registry</h3>
+        <p>Model prices as data you edit while the app runs. Automated sources watch providers but can only file drafts. A human approves each one.</p>
+        <div class="meta"><span class="mono">70 tests</span><a href="https://github.com/Tayyab-Bilal/model-price-registry">GitHub</a></div>
+      </li>
+      <li class="repo panel hud">
+        <h3>workflow-doctor</h3>
+        <p>Builds automation workflows from plain language and diagnoses why existing ones fail. The LLM only reads the request. Code does the wiring and checking.</p>
+        <div class="meta"><span class="mono">92 tests</span><a href="https://github.com/Tayyab-Bilal/workflow-doctor">GitHub</a></div>
+      </li>
+      <li class="repo panel hud">
+        <h3>async-doc-ingestion</h3>
+        <p>One async API that takes any file, extracts, tags and indexes it per tenant. A crash or re-upload never pays twice for OCR or embeddings.</p>
+        <div class="meta"><span class="mono">79 tests</span><a href="https://github.com/Tayyab-Bilal/async-doc-ingestion">GitHub</a></div>
+      </li>
+      <li class="repo panel hud">
+        <h3>fastapi-prod-hardening</h3>
+        <p>The safeguards a multi-tenant FastAPI service needs when it calls LLMs, each one a small tested module that runs offline.</p>
+        <div class="meta"><span class="mono">100 tests</span><a href="https://github.com/Tayyab-Bilal/fastapi-prod-hardening">GitHub</a></div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section id="writing">
+  <div class="wrap">
+    <h2>Writing</h2>
+    <div class="post panel hud">
+      <h3>Everyone's first answer is a vector database. Mine was grep.</h3>
+      <p class="meta">LinkedIn · 26 Oct 2026</p>
+      <p>Why I used keyword search to find workspace records and let the model pick from a short list. Finding the right record went from 1 to 2 minutes to about 16 seconds, and where vectors still win.</p>
+      <a href="https://www.linkedin.com/in/tayyab-bilal-79b509187/recent-activity/all/">Read it on LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="wrap">
+    <h2>Experience</h2>
+    <ul class="jobs">
+      <li class="job">
+        <span class="when">Apr 2026 to now</span>
+        <div>
+          <h3>Senior AI Engineer, SWSAM Solutions</h3>
+          <p>AI workspace platform for a client, in production in early release with about 300 users. Led 3 engineers. Top contributor to the AI service. Built the autonomous planner and executor, the approval gate, the discovery agent and AI credit metering. Primary code reviewer.</p>
+        </div>
+      </li>
+      <li class="job">
+        <span class="when">Nov 2024 to Apr 2026</span>
+        <div>
+          <h3>Senior Machine Learning Engineer, Transdata</h3>
+          <p>Conversational AI and reporting systems for enterprise clients. Split an agent proof of concept into microservices. Cut inference cost about 80% by serving a 4-bit QLoRA Qwen 7B model.</p>
+        </div>
+      </li>
+      <li class="job">
+        <span class="when">Feb 2022 to Sep 2024</span>
+        <div>
+          <h3>Machine Learning Engineer, Quid Sol</h3>
+          <p>ML apps and chatbots for healthcare, e-commerce and fintech clients. Built Rasa assistants, then ReAct agents by hand with plain Python loops before agent frameworks existed.</p>
+        </div>
+      </li>
+      <li class="job">
+        <span class="when">Tools I use</span>
+        <div>
+          <p>Python, FastAPI, LangGraph, LangChain, PostgreSQL, Redis, Qdrant, pytest, GitHub Actions. For coding: Claude Code, Codex, OpenCode, a DeepSeek harness, T3 Code and local Ollama models.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <h2>Contact</h2>
+    <p class="lede">Email is the fastest way to reach me.</p>
+    <div class="contact-row">
+      <span class="email" id="email">tayyaib055766@gmail.com</span>
+      <button class="btn copy" id="copy-email" type="button">Copy email</button>
+    </div>
+    <p class="status" id="copy-status" role="status"></p>
+    <div class="btns">
+      <a class="btn" href="mailto:tayyaib055766@gmail.com">Send an email</a>
+      <a class="btn" href="https://github.com/Tayyab-Bilal">GitHub</a>
+      <a class="btn" href="https://www.linkedin.com/in/tayyab-bilal-79b509187/">LinkedIn</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">Tayyab Bilal · Lahore</div>
+</footer>
+<nav class="dock" aria-label="Sections">
+  <a href="#top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a>
+  <a href="#work"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>Work</span></a>
+  <a href="#demo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M12 15h5"/></svg><span>Demo</span></a>
+  <a href="#oss"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg><span>Code</span></a>
+  <a href="#experience"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Experience</span></a>
+  <a href="#contact"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Contact</span></a>
+</nav>
+
+<script src="assets/main.js"></script>
+</body>
+</html>
