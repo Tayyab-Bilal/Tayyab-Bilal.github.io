@@ -85,6 +85,19 @@ if (typeof document !== "undefined") {
     new IntersectionObserver(function (e) { dock.classList.toggle("away", e[0].isIntersecting); }, { threshold: 0.35 }).observe(hero);
   }
 
+  // Agents on duty: each bot cycles through its tasks.
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.querySelectorAll(".agent").forEach(function (el, i) {
+      var tasks = el.dataset.tasks.split("|"), n = 0, what = el.querySelector(".what");
+      setTimeout(function () {
+        setInterval(function () {
+          what.classList.add("fade");
+          setTimeout(function () { n = (n + 1) % tasks.length; what.textContent = tasks[n]; what.classList.remove("fade"); }, 250);
+        }, 3200);
+      }, i * 700);
+    });
+  }
+
   // Copy email.
   var copyBtn = document.getElementById("copy-email");
   var copyStatus = document.getElementById("copy-status");

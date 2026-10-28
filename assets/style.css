@@ -278,3 +278,37 @@ details p { margin: 0; }
 
   body { padding-bottom: calc(var(--dock-h) + 72px + env(safe-area-inset-bottom)); }
 }
+
+/* Agents on duty: small bots cycling through what each system does. */
+.hero-side { display: grid; gap: 14px; }
+.crew { padding: 0; }
+.crew::before { display: none; }
+.crew-title { margin: 4px 0 8px; }
+.crew ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.agent { display: flex; gap: 10px; align-items: center; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0; }
+.agent div { min-width: 0; display: grid; gap: 2px; }
+.agent b { font: 600 .85rem var(--sans); color: var(--white); }
+.agent .what { font: .75rem/1.35 var(--mono); color: var(--text-2); min-height: 2.7em; }
+.agent .bar { display: block; height: 2px; border-radius: 2px; background: var(--line); overflow: hidden; position: relative; }
+.agent .bar::after { content: ""; position: absolute; inset: 0; width: 35%; background: var(--blue-light); }
+.bot { width: 38px; height: 38px; flex: none; fill: none; stroke: var(--blue-light); stroke-width: 2; stroke-linecap: round; }
+.bot rect:first-of-type { fill: rgba(53, 132, 228, .12); }
+.bot .eyes rect { fill: var(--blue-light); stroke: none; transform-origin: center 20px; }
+.bot .ant { fill: var(--blue-light); stroke: none; }
+.agent[data-agent="gate"] .bot { stroke: var(--amber); } .agent[data-agent="gate"] .bot .eyes rect, .agent[data-agent="gate"] .bot .ant { fill: var(--amber); }
+.agent[data-agent="gate"] .bar::after { background: var(--amber); }
+@media (prefers-reduced-motion: no-preference) {
+  .bot .eyes rect { animation: blink 4s infinite; }
+  .agent:nth-child(2) .eyes rect { animation-delay: 1.3s; } .agent:nth-child(3) .eyes rect { animation-delay: 2.1s; } .agent:nth-child(4) .eyes rect { animation-delay: .6s; }
+  .bot .ant { animation: ping 1.6s ease-in-out infinite; }
+  .bot { animation: bob 3s ease-in-out infinite; }
+  .agent:nth-child(even) .bot { animation-delay: 1.5s; }
+  .agent .bar::after { animation: work 1.8s ease-in-out infinite; }
+  .agent .what { transition: opacity .25s; }
+  .agent .what.fade { opacity: 0; }
+  @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  @keyframes ping { 50% { opacity: .3; } }
+  @keyframes bob { 50% { transform: translateY(-2px); } }
+  @keyframes work { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
+}
+@media (max-width: 459px) { .crew ul { grid-template-columns: 1fr; } }
