@@ -87,7 +87,7 @@
 
   // The bubble stays up while the pointer is on Bolt, its bubble or its chat (they are all inside .pet).
   function say(t, ms) {
-    bubble.textContent = t; pet.classList.add("talking");
+    bubble.textContent = t; rel = null; pet.classList.add("talking");
     clearTimeout(hideT); hideT = setTimeout(function () { if (hover) return say(bubble.textContent, 1500); pet.classList.remove("talking"); }, ms || 3600);
   }
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
@@ -104,10 +104,12 @@
   }
 
   // While the bubble is up, a pointer heading for it (or just near it) freezes Bolt so the "ask me" button stays put.
-  var lastD = 1e9;
+  var lastD = 1e9, rel = null;
   function approaching(e) {
     if (!pet.classList.contains("talking")) { lastD = 1e9; return false; }
-    var r = bubble.parentNode.getBoundingClientRect(), dx = Math.max(r.left - e.clientX, 0, e.clientX - r.right), dy = Math.max(r.top - e.clientY, 0, e.clientY - r.bottom);
+    // Bubble box relative to Bolt, measured once per text/flip change (a layout read on every mousemove made the page janky).
+    if (!rel) { var b = bubble.parentNode.getBoundingClientRect(); rel = { l: b.left - x, r: b.right - x, t: b.top - y, b: b.bottom - y }; }
+    var dx = Math.max(rel.l + x - e.clientX, 0, e.clientX - rel.r - x), dy = Math.max(rel.t + y - e.clientY, 0, e.clientY - rel.b - y);
     var d = Math.hypot(dx, dy), near = d < 40 || (d < 400 && d < lastD);
     lastD = d;
     if (near) { tx = x; ty = y; }
@@ -126,11 +128,11 @@
         pet.classList.add("dizzy"); say("whoa. slow down.", 2000);
         setTimeout(function () { pet.classList.remove("dizzy"); }, 1200);
       }
-    });
+    }, { passive: true });
     document.addEventListener("mouseover", function (e) {
       var a = e.target.closest && e.target.closest("a.btn, .readcode, .opts label");
       if (a && Math.random() < 0.35) say(pick(["ooh, that one.", "click it. what's the worst that happens.", "good choice. probably."]), 2200);
-    });
+    }, { passive: true });
   }
 
   // Click Bolt: it does something weird. The "ask me" button in its bubble opens the chat.
@@ -188,10 +190,10 @@
   var arm = pet.querySelector(".pet-arm"), running = false, lastLean = 0, flipped = false;
   function tick() {
     x += (tx - x) * (still ? 1 : 0.08); y += (ty - y) * (still ? 1 : 0.08);
-    var lean = Math.round(Math.max(-25, Math.min(25, (tx - x) * 0.4)));
-    pet.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y) + "px)";
+    var lean = Math.round(Math.max(-25, Math.min(25, (tx - x) * 0.4)) / 4) * 4; // 4deg steps: SVG rotates cost a layout each, so fewer of them
+    pet.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)"; // subpixel: no 1px stair-stepping when slowing down
     if (lean !== lastLean) { arm.style.transform = "rotate(" + lean + "deg)"; lastLean = lean; }
-    var f = x > innerWidth - 340; if (f !== flipped) { pet.classList.toggle("flip", f); flipped = f; }
+    var f = x > innerWidth - 340; if (f !== flipped) { pet.classList.toggle("flip", f); flipped = f; rel = null; }
     if (Math.abs(tx - x) < 0.5 && Math.abs(ty - y) < 0.5) { running = false; return; }
     requestAnimationFrame(tick);
   }
