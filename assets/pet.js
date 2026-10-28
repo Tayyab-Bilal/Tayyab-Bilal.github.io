@@ -81,11 +81,12 @@
   };
   var clickLines = ["beep.", "*spins for no reason*", "fire? no fire. just checking.", "I dropped a bolt. it was me. I'm the bolt.", "boop."];
 
-  var tx = innerWidth - 120, ty = innerHeight - 140, x = tx, y = ty, lastMove = Date.now(), speed = 0, said = {}, hideT, asleep = false;
+  var tx = innerWidth - 120, ty = innerHeight - 140, x = tx, y = ty, lastMove = Date.now(), speed = 0, said = {}, hideT, asleep = false, hover = false, holdUntil = 0;
 
+  // The bubble stays up while the pointer is on Bolt, its bubble or its chat (they are all inside .pet).
   function say(t, ms) {
     bubble.textContent = t; pet.classList.add("talking");
-    clearTimeout(hideT); hideT = setTimeout(function () { pet.classList.remove("talking"); }, ms || 3600);
+    clearTimeout(hideT); hideT = setTimeout(function () { if (hover) return say(bubble.textContent, 1500); pet.classList.remove("talking"); }, ms || 3600);
   }
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
 
@@ -103,7 +104,7 @@
   if (!touch) {
     addEventListener("mousemove", function (e) {
       // Clingy but catchable: once the cursor is on top of Bolt, it holds still so you can click it.
-      if (chatting || Math.hypot(e.clientX - (x + 32), e.clientY - (y + 32)) < 44) { lastMove = Date.now(); return; }
+      if (hover || Date.now() < holdUntil || chatting || Math.hypot(e.clientX - (x + 32), e.clientY - (y + 32)) < 44) { lastMove = Date.now(); return; }
       var dx = e.clientX + 28 - tx, dy = e.clientY + 22 - ty;
       speed = speed * 0.8 + Math.hypot(dx, dy) * 0.2;
       tx = e.clientX + 28; ty = e.clientY + 22; lastMove = Date.now();
@@ -122,7 +123,16 @@
   // Click Bolt: it does something weird. The "ask me" button in its bubble opens the chat. × sends it to bed.
   function openChat() { chatting = true; pet.classList.add("chatting"); pet.classList.remove("talking"); setTimeout(function () { chat.q.focus(); }, 50); }
   // Hovering Bolt brings up its bubble, so the "ask me" button is always one hover away.
-  pet.addEventListener("mouseenter", function () { if (!chatting && !pet.classList.contains("talking")) say(pick(["need something?", "ask me stuff. or poke me.", "hi. again."]), 4000); });
+  // It also freezes in place, and keeps still for a moment after the pointer leaves so a diagonal path to the button works.
+  pet.addEventListener("pointerenter", function (e) {
+    if (e.pointerType === "touch") return;
+    hover = true; tx = x; ty = y;
+    if (!chatting && !pet.classList.contains("talking")) say(pick(["need something?", "ask me stuff. or poke me.", "hi. again."]), 4000);
+  });
+  pet.addEventListener("pointerleave", function () {
+    hover = false; holdUntil = Date.now() + 700;
+    if (pet.classList.contains("talking")) say(bubble.textContent, 1800);
+  });
   pet.addEventListener("click", function (e) {
     if (e.target.closest(".pet-bed")) {
       try { localStorage.setItem("pet", "off"); } catch (err) {}
@@ -133,7 +143,15 @@
     if (chatting) { closeChat(); return; }
     antic();
   });
-  function antic() { pet.classList.remove("spin"); void pet.offsetWidth; pet.classList.add("spin"); say(pick(clickLines), 2200); }
+  // Click lines: a shuffled deck from bolt-lines.js (no repeats until used up); falls back to clickLines.
+  var deck = [];
+  function clickLine() {
+    var all = window.BOLT_LINES;
+    if (!all || !all.length) return pick(clickLines);
+    if (!deck.length) { deck = all.slice(); for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; } }
+    return deck.pop();
+  }
+  function antic() { pet.classList.remove("spin"); void pet.offsetWidth; pet.classList.add("spin"); say(clickLine(), 2800); }
 
   // More reactions to what the visitor does.
   function on(sel, ev, fn) { var el = document.querySelector(sel); if (el) el.addEventListener(ev, fn); }
