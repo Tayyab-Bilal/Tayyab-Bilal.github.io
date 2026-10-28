@@ -18,7 +18,7 @@ const DUNNO = `dunno. not on this page. email him: ${EMAIL}`;
 export const FACTS = [
   ["who tayyab about intro senior ai engineer years experience long", "Senior AI Engineer in Lahore. 5 years in ML and AI, about 4 of them building agents."],
   ["agents langgraph react rasa agent experience", "about 4 years of agents: Rasa state machines, then hand-written ReAct loops, now LangGraph."],
-  ["current job swsam now production users", "now: Senior AI Engineer at SWSAM. the platform is in production, early release, about 300 users. he led 3 engineers."],
+  ["current job swsam now production users", "now: Senior AI Engineer at SWSAM. the platform is in production, early release, about 300 users. he leads a team of engineers."],
   ["transdata previous job before qwen fine tune fine-tuning qlora inference cost", "at Transdata he fine-tuned Qwen 7B with QLoRA (over 95% accuracy) and cut inference cost about 80% serving it in 4-bit on AWS GPUs."],
   ["quid sol first job chatbots healthcare fintech", "at Quid Sol (2022 to 2024) he built ML apps and chatbots, Rasa assistants, then ReAct agents by hand."],
   ["rag retrieval evaluation eval evals ragas faithfulness", "RAG: yes. he designed a Three-Hook evaluation model (every query, a sampled judge, a CI golden set)."],

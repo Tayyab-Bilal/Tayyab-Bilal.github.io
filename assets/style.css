@@ -327,8 +327,10 @@ details p { margin: 0; }
   font: .78rem/1.35 var(--mono); color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
   opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; pointer-events: none; }
 .pet.talking .pet-bubble { opacity: 1; transform: none; pointer-events: auto; }
-.pet-bubble button { border: 0; background: none; color: var(--text-2); cursor: pointer; font: 1rem/1 var(--sans); padding: 0 2px; }
-.pet-bubble button:hover { color: var(--text); }
+.pet-bubble .pet-bed { border: 0; background: none; color: var(--text-2); cursor: pointer; font: 1rem/1 var(--sans); padding: 0 2px; }
+.pet-bubble .pet-ask { flex: none; border: 1px solid var(--blue-deep); background: rgba(26, 95, 180, .25); color: var(--text); border-radius: 6px; cursor: pointer; font: 500 .72rem var(--sans); padding: 2px 7px; align-self: center; }
+.pet-bubble .pet-ask:hover { background: var(--blue-deep); color: #fff; }
+.pet-bubble .pet-bed:hover { color: var(--text); }
 @media (prefers-reduced-motion: no-preference) {
   .pet-head { animation: pet-look 5s ease-in-out infinite; }
   .pet.dizzy svg { animation: pet-dizzy .6s linear 2; }

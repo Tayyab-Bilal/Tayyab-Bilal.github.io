@@ -9,7 +9,7 @@
   var pet = document.createElement("div");
   pet.className = "pet" + (touch ? " parked" : "");
   pet.innerHTML =
-    '<div class="pet-bubble"><span></span><button type="button" tabindex="-1" title="Send Bolt to bed">×</button></div>' +
+    '<div class="pet-bubble"><span></span><button type="button" class="pet-ask">ask me</button><button type="button" class="pet-bed" tabindex="-1" title="Send Bolt to bed">×</button></div>' +
     '<svg viewBox="0 0 64 64" aria-hidden="true"><g class="pet-body">' +
     '<rect x="16" y="50" width="32" height="8" rx="3" class="pet-base"/>' +
     '<g class="pet-arm"><rect x="28" y="30" width="8" height="22" rx="4"/><circle cx="32" cy="30" r="5" class="pet-joint"/>' +
@@ -25,7 +25,7 @@
   var facts = [
     ["who tayyab about intro senior ai engineer years experience long", "Senior AI Engineer in Lahore. 5 years in ML and AI, about 4 of them building agents."],
     ["agents langgraph react rasa agent experience", "about 4 years of agents: Rasa state machines, then hand-written ReAct loops, now LangGraph."],
-    ["current job swsam now production users", "now: Senior AI Engineer at SWSAM. the platform is in production, early release, about 300 users. he led 3 engineers."],
+    ["current job swsam now production users", "now: Senior AI Engineer at SWSAM. the platform is in production, early release, about 300 users. he leads a team of engineers."],
     ["transdata previous job before qwen fine tune fine-tuning qlora inference cost", "at Transdata he fine-tuned Qwen 7B with QLoRA (over 95% accuracy) and cut inference cost about 80% serving it in 4-bit on AWS GPUs."],
     ["quid sol first job chatbots healthcare fintech", "at Quid Sol (2022 to 2024) he built ML apps and chatbots, Rasa assistants, then ReAct agents by hand."],
     ["rag retrieval evaluation eval evals ragas faithfulness", "RAG: yes. he designed a Three-Hook evaluation model (every query, a sampled judge, a CI golden set)."],
@@ -119,16 +119,20 @@
     });
   }
 
+  // Click Bolt: it does something weird. The "ask me" button in its bubble opens the chat. × sends it to bed.
+  function openChat() { chatting = true; pet.classList.add("chatting"); pet.classList.remove("talking"); setTimeout(function () { chat.q.focus(); }, 50); }
+  // Hovering Bolt brings up its bubble, so the "ask me" button is always one hover away.
+  pet.addEventListener("mouseenter", function () { if (!chatting && !pet.classList.contains("talking")) say(pick(["need something?", "ask me stuff. or poke me.", "hi. again."]), 4000); });
   pet.addEventListener("click", function (e) {
-    if (e.target.closest(".pet-bubble button")) {
+    if (e.target.closest(".pet-bed")) {
       try { localStorage.setItem("pet", "off"); } catch (err) {}
       say("fine. goodnight.", 1200); setTimeout(function () { pet.remove(); }, 1200); return;
     }
+    if (e.target.closest(".pet-ask")) { openChat(); return; }
     if (chat.contains(e.target)) return;
-    if (!chatting) { chatting = true; pet.classList.add("chatting"); pet.classList.remove("talking"); setTimeout(function () { chat.q.focus(); }, 50); }
-    else closeChat();
+    if (chatting) { closeChat(); return; }
+    antic();
   });
-  pet.addEventListener("dblclick", function () { closeChat(); antic(); });
   function antic() { pet.classList.remove("spin"); void pet.offsetWidth; pet.classList.add("spin"); say(pick(clickLines), 2200); }
 
   // More reactions to what the visitor does.
