@@ -1,4 +1,5 @@
-// Cloudflare Worker for Bolt's AI mode (free tier). Keeps the API key off the static site.
+// Cloudflare Worker for Bolt's AI mode. Uses Workers AI on the free plan: no API key, no card.
+// When the free daily allowance runs out the call fails and Bolt falls back to grep answers, so it can never cost money.
 // The model only rephrases the facts the page sends; it gets no tools and no other data.
 const ALLOWED = ["https://tayyab-bilal.github.io", "http://127.0.0.1:8765", "http://localhost:8765"];
 const SYSTEM = `You are Bolt, a clumsy, clingy little robot-arm pet on Tayyab Bilal's portfolio site.
@@ -18,15 +19,14 @@ export default {
     hits.set(ip, [...list, now]);
     let body; try { body = await req.json(); } catch { return new Response("bad", { status: 400, headers: cors }); }
     const q = String(body.q || "").slice(0, 200), facts = (Array.isArray(body.facts) ? body.facts : []).slice(0, 3).map(f => String(f).slice(0, 300));
-    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: { authorization: `Bearer ${env.GROQ_API_KEY}`, "content-type": "application/json" },
-      body: JSON.stringify({ model: "llama-3.1-8b-instant", max_tokens: 90, temperature: 0.7, messages: [
+    let answer = "";
+    try {
+      const out = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", { max_tokens: 90, temperature: 0.7, messages: [
         { role: "system", content: SYSTEM },
-        { role: "user", content: `Facts:\n- ${facts.join("\n- ") || "(none)"}\n\nQuestion: ${q}` }] })
-    });
-    if (!r.ok) return new Response("upstream", { status: 502, headers: cors });
-    const d = await r.json(), answer = (d.choices?.[0]?.message?.content || "").trim().slice(0, 280);
+        { role: "user", content: `Facts:\n- ${facts.join("\n- ") || "(none)"}\n\nQuestion: ${q}` }] });
+      answer = String(out?.response || "").trim().slice(0, 280);
+    } catch { return new Response("upstream", { status: 502, headers: cors }); }
+    if (!answer) return new Response("empty", { status: 502, headers: cors });
     return Response.json({ answer }, { headers: cors });
   }
 };

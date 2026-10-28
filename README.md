@@ -43,5 +43,8 @@ node tests/gate-check.js
 ## TODO
 
 - [ ] Replace the LinkedIn activity link in the Writing section with the direct URL of the grep-first post (26 Oct 2026).
-- [ ] Optional: Bolt AI mode. Deploy worker/bolt-worker.js with a GROQ_API_KEY secret and put its URL in the bolt-api meta tag.
+- [ ] Optional: Bolt AI mode (free, Cloudflare Workers AI, no key, no card):
+      `cd worker && npx wrangler login && npx wrangler deploy`, then put the printed workers.dev URL
+      in the `bolt-api` meta tag of index.html and work.html. Over the free daily allowance it just fails
+      and Bolt answers from grep instead.
 - [ ] Optional: custom domain. Add a `CNAME` file with the domain and set the DNS records GitHub Pages lists.
