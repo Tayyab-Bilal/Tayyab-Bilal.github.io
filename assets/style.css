@@ -239,6 +239,7 @@ legend { margin-bottom: 10px; }
 .email { font-family: var(--mono); font-size: 1.05rem; user-select: all; background: var(--surface-solid); border: 1px solid var(--line-2); border-radius: 6px; padding: 7px 12px; }
 .status { color: var(--text-2); font-size: .9rem; min-height: 1.4em; margin: 0 0 14px; }
 
+#wake-bolt { margin-left: 1.2em; font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; opacity: .7; }
 footer { padding: 28px 0 8px; color: var(--text-2); font-size: .85rem; font-family: var(--mono); border-top: 1px solid var(--line); }
 
 /* Floating bottom dock, like his desktop. Hidden on the first screen so it never covers the hero. */
@@ -311,6 +312,7 @@ details p { margin: 0; }
 
 /* Bolt, the pet robot arm. */
 .pet { position: fixed; left: 0; top: 0; z-index: 25; width: 64px; height: 64px; cursor: pointer; will-change: transform; contain: layout style; }
+.pet.bed { display: none; }
 .pet.parked { left: auto; top: auto; right: 12px; bottom: calc(var(--dock-h) + 30px + env(safe-area-inset-bottom)); }
 .pet svg { width: 64px; height: 64px; overflow: visible; }
 .pet-body { fill: var(--surface-2); stroke: var(--blue-light); stroke-width: 2; stroke-linecap: round; }
@@ -327,7 +329,7 @@ details p { margin: 0; }
   font: .78rem/1.35 var(--mono); color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
   opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; pointer-events: none; }
 .pet.talking .pet-bubble { opacity: 1; transform: none; pointer-events: auto; }
-.pet-bubble .pet-bed { border: 0; background: none; color: var(--text-2); cursor: pointer; font: 1rem/1 var(--sans); padding: 0 2px; }
+.pet-bubble .pet-bed { margin-left: 10px; border: 0; background: none; color: var(--text-2); cursor: pointer; font: 1rem/1 var(--sans); padding: 0 2px; }
 .pet-bubble .pet-ask { flex: none; border: 1px solid var(--blue-deep); background: rgba(26, 95, 180, .25); color: var(--text); border-radius: 6px; cursor: pointer; font: 500 .72rem var(--sans); padding: 2px 7px; align-self: center; }
 .pet-bubble .pet-ask:hover { background: var(--blue-deep); color: #fff; }
 .pet-bubble .pet-bed:hover { color: var(--text); }

@@ -4,7 +4,9 @@
   if (typeof document === "undefined") return;
   var still = matchMedia("(prefers-reduced-motion: reduce)").matches;
   var touch = matchMedia("(pointer: coarse)").matches;
-  try { if (localStorage.getItem("pet") === "off") return; } catch (e) {}
+  // Bed is for this visit only (sessionStorage). Drop the old permanent flag so Bolt comes back.
+  var bedded = false, wakeBtn = document.getElementById("wake-bolt");
+  try { localStorage.removeItem("pet"); bedded = sessionStorage.getItem("pet") === "off"; } catch (e) {}
 
   var pet = document.createElement("div");
   pet.className = "pet" + (touch ? " parked" : "");
@@ -147,9 +149,11 @@
     if (pet.classList.contains("talking")) say(bubble.textContent, 1800);
   });
   pet.addEventListener("click", function (e) {
-    if (e.target.closest(".pet-bed")) {
-      try { localStorage.setItem("pet", "off"); } catch (err) {}
-      say("fine. goodnight.", 1200); setTimeout(function () { pet.remove(); }, 1200); return;
+    var bedBtn = e.target.closest(".pet-bed");
+    if (bedBtn) {
+      // Two clicks to send Bolt to bed, so a slip next to "ask me" does nothing.
+      if (!bedBtn.dataset.sure) { bedBtn.dataset.sure = 1; bedBtn.textContent = "bed?"; setTimeout(function () { delete bedBtn.dataset.sure; bedBtn.textContent = "\u00d7"; }, 2500); return; }
+      say("fine. goodnight.", 1200); setTimeout(function () { sleepIn(true); }, 1200); return;
     }
     if (e.target.closest(".pet-ask")) { openChat(); return; }
     if (chat.contains(e.target)) return;
@@ -164,6 +168,15 @@
     if (!deck.length) { deck = all.slice(); for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; } }
     return deck.pop();
   }
+  // Bed hides Bolt for this visit; the footer "wake Bolt" button brings it back.
+  function sleepIn(on) {
+    pet.classList.toggle("bed", on); if (wakeBtn) wakeBtn.hidden = !on;
+    try { on ? sessionStorage.setItem("pet", "off") : sessionStorage.removeItem("pet"); } catch (err) {}
+    if (!on) { lastMove = Date.now(); asleep = false; pet.classList.remove("asleep"); say("I'm back. did you miss me. you did.", 3200); }
+    var b = pet.querySelector(".pet-bed"); delete b.dataset.sure; b.textContent = "\u00d7";
+  }
+  if (wakeBtn) wakeBtn.addEventListener("click", function () { sleepIn(false); });
+  if (bedded) sleepIn(true);
   function antic() { pet.classList.remove("spin"); void pet.offsetWidth; pet.classList.add("spin"); say(clickLine(), 2800); }
 
   // More reactions to what the visitor does.
