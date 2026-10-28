@@ -56,9 +56,9 @@
         <span class="src">Discovery agent, SWSAM. <a href="https://github.com/Tayyab-Bilal/grep-first-agent">grep-first-agent</a> and <a href="#writing">the post</a></span>
       </li>
       <li class="result panel hud">
-        <span class="big">114 attacks, 7 holes closed</span>
-        <p>Prompt-injection test suite of 114 attacks that closed 7 holes in an agent runtime I built.</p>
-        <span class="src">Agent kit, SWSAM (pre-release). Public version: <a href="https://github.com/Tayyab-Bilal/agent-kit">agent-kit</a></span>
+        <span class="big">~80% lower inference cost</span>
+        <p>Fine-tuned Qwen 7B with QLoRA (over 95% accuracy) and served it in 4-bit on AWS GPUs, for enterprise conversational AI.</p>
+        <span class="src">Transdata. The 114-attack injection suite is in <a href="#case-kit">case 2</a></span>
       </li>
     </ul>
   </div>
@@ -119,13 +119,13 @@
           <dt>Stack</dt>
           <dd>Python, LangChain and LangGraph tools, PostgreSQL, CloudEvents. Public version: SQLite.</dd>
           <dt>How it works</dt>
-          <dd><ul>
+          <dd><details><summary>Show the details</summary><ul>
             <li>A fixed map ties each write tool to one permission action. Unmapped tools are refused before any lookup, and delete tools are denied on purpose.</li>
             <li>The mode (Autonomous, Suggest Only, Disabled) is read fresh on every call. Suggest Only stores a draft with signed arguments, and approval replays exactly those arguments, once.</li>
             <li>A permissions outage is retried, then the run is parked. It is never reported as "disabled".</li>
-          </ul></dd>
+          </ul></details></dd>
           <dt>Trade-off and what failed</dt>
-          <dd>An outage used to show up as "disabled in your settings", so users went to check settings that were fine. I split unavailable, misconfigured and disabled into three answers. I also tried LangGraph <code>interrupt()</code>: nested agents without checkpointers never passed the interrupt up, so I kept durable drafts instead.</dd>
+          <dd><details><summary>Show what failed and why</summary><p>An outage used to show up as "disabled in your settings", so users went to check settings that were fine. I split unavailable, misconfigured and disabled into three answers. I also tried LangGraph <code>interrupt()</code>: nested agents without checkpointers never passed the interrupt up, so I kept durable drafts instead.</p></details></dd>
           <dt>Outcome</dt>
           <dd>All 31 write tools go through one checkpoint, and a CI test fails if a new write tool is not classified. Public version: 95 tests.</dd>
         </dl>
@@ -154,13 +154,13 @@
           <dt>Stack</dt>
           <dd>Python, LangGraph, YAML agent cards, SQLite, JMESPath, pytest.</dd>
           <dt>How it works</dt>
-          <dd><ul>
+          <dd><details><summary>Show the details</summary><ul>
             <li>Each agent is one folder with a strict card. A write tool that is neither guarded nor confirm-gated makes the card invalid.</li>
             <li>Risky actions are never run when the model asks. Code stores the exact arguments, writes the question itself, and waits. A fail-closed consent judge reads only that question and the user's reply. Anything but a clear yes cancels.</li>
             <li>Big tool results go into per-task SQLite. The model queries them with SQL that a deny-by-default authorizer keeps read only.</li>
-          </ul></dd>
+          </ul></details></dd>
           <dt>Trade-off and what failed</dt>
-          <dd>I tried a Pyodide (WASM) sandbox for the model's queries and rejected it: about 3 s cold start, about 350 MB, and no real isolation. The agent is about 2.6x slower than the old builder and uses 12 to 13x the tokens. The judge is strict, so a polite "yes, thanks" cancels.</dd>
+          <dd><details><summary>Show what failed and why</summary><p>I tried a Pyodide (WASM) sandbox for the model's queries and rejected it: about 3 s cold start, about 350 MB, and no real isolation. The agent is about 2.6x slower than the old builder and uses 12 to 13x the tokens. The judge is strict, so a polite "yes, thanks" cancels.</p></details></dd>
           <dt>Outcome</dt>
           <dd>A 114-attack suite closed 7 prompt-injection holes. 17/17 parity with the old workflow builder, up from 12/17. Public version: 184 tests, 20 of them attacks.</dd>
         </dl>
@@ -189,13 +189,13 @@
           <dt>Stack</dt>
           <dd>Python, FastAPI, LangChain structured output, PostgreSQL advisory locks, RRULE, CloudEvents.</dd>
           <dt>How it works</dt>
-          <dd><ul>
+          <dd><details><summary>Show the details</summary><ul>
             <li>The goal is grounded against real data first. The model only extracts intent. Code assigns ids, links steps and builds the schedule, and refuses plans that cannot work.</li>
             <li>Only one worker owns a run, through an atomic claim and a fencing token. A reaper parks runs whose worker died.</li>
             <li>Hard limits: 90 turns, 150 writes per run, a resume cap and a loop guard. A write ledger turns a repeated write into a no-op, and the final status comes from stored step states, not the agent's words.</li>
-          </ul></dd>
+          </ul></details></dd>
           <dt>Trade-off and what failed</dt>
-          <dd>The planner was quietly running on the platform's default model, because the service was never registered for model selection. I fixed the routing and moved it to a cheaper model. Each planning call got about 55% slower, which is fine because planning runs in the background.</dd>
+          <dd><details><summary>Show what failed and why</summary><p>The planner was quietly running on the platform's default model, because the service was never registered for model selection. I fixed the routing and moved it to a cheaper model. Each planning call got about 55% slower, which is fine because planning runs in the background.</p></details></dd>
           <dt>Outcome</dt>
           <dd>Planner about 77% cheaper, with 24/24 benchmark and 20/20 end-to-end runs passing after the switch. I analysed 320 QA runs (92% completed) and fed the findings into a hardening list. Public version: 148 tests.</dd>
         </dl>
@@ -224,13 +224,13 @@
           <dt>Stack</dt>
           <dd>Python, FastAPI, SQLite, Anthropic and OpenAI judge adapters, GitHub Actions.</dd>
           <dt>How it works</dt>
-          <dd><ul>
+          <dd><details><summary>Show the details</summary><ul>
             <li>Hook 1, every query, no LLM: score gap, empty results and p95 latency over a rolling window.</li>
             <li>Hook 2, a small sample of live traffic, judged in the background: claim-level faithfulness, relevance, context precision and drift.</li>
             <li>Hook 3, every PR: a golden JSONL set, thresholds and a saved baseline. A metric that gets worse fails CI even above its threshold.</li>
-          </ul></dd>
+          </ul></details></dd>
           <dt>Trade-off and what failed</dt>
-          <dd>In review I found that the "context" being judged was an intermediate answer, not the retrieved chunks, so the scores compared one answer with another. Hook 2 now checks that every context is a chunk the retriever really returned. A text check alone cannot catch a reworded answer.</dd>
+          <dd><details><summary>Show what failed and why</summary><p>In review I found that the "context" being judged was an intermediate answer, not the retrieved chunks, so the scores compared one answer with another. Hook 2 now checks that every context is a chunk the retriever really returned. A text check alone cannot catch a reworded answer.</p></details></dd>
           <dt>Outcome</dt>
           <dd>A CI gate that cannot switch itself off: an unmeasured threshold or a typo in the threshold file fails. Public version: 165 tests.</dd>
         </dl>

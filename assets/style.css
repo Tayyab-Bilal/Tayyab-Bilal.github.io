@@ -228,8 +228,14 @@ footer { padding: 28px 0 8px; color: var(--text-2); font-size: .85rem; font-fami
   .dock a span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 
-/* Small screens: diagrams fit the panel; tap opens the full-size SVG. */
+details summary { cursor: pointer; color: var(--link); font-weight: 500; }
+details[open] summary { margin-bottom: 6px; }
+details p { margin: 0; }
+
+/* Small screens: labels would be unreadable, so show a link to the full diagram instead. */
 @media (max-width: 719px) {
-  .diagram { padding: 8px; }
-  .diagram img { max-width: 100% !important; }
+  .diagram { padding: 12px; }
+  .diagram img { display: none; }
+  .diagram::after { content: "Open the diagram full size \2197"; font-weight: 500; }
+  body { padding-bottom: calc(var(--dock-h) + 72px + env(safe-area-inset-bottom)); }
 }
