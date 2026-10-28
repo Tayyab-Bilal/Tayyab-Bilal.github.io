@@ -152,6 +152,7 @@
       var lean = Math.max(-25, Math.min(25, (tx - x) * 0.4));
       pet.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y) + "px)";
       pet.style.setProperty("--lean", lean + "deg");
+      pet.classList.toggle("flip", x > innerWidth - 340);
     }
     requestAnimationFrame(tick);
   }
