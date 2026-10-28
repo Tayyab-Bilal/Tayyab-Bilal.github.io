@@ -98,6 +98,12 @@ if (typeof document !== "undefined") {
     });
   }
 
+  // Pause looping animations when they are off screen or the tab is hidden.
+  var heroSeen = true;
+  function calm() { root.classList.toggle("calm", document.hidden || !heroSeen); }
+  document.addEventListener("visibilitychange", calm);
+  if ("IntersectionObserver" in window) new IntersectionObserver(function (e) { heroSeen = e[0].isIntersecting; calm(); }).observe(hero);
+
   // Copy email.
   var copyBtn = document.getElementById("copy-email");
   var copyStatus = document.getElementById("copy-status");

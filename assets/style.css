@@ -17,7 +17,7 @@
   --amber: #e5a50a;
   --grid: rgba(255, 255, 255, .03);
   --link: #62a0ea;
-  --dock-bg: rgba(30, 32, 38, .72);
+  --dock-bg: rgba(26, 28, 33, .96);
   --display: "Anton", "Oswald", Impact, "Arial Narrow", sans-serif;
   --sans: "Ubuntu Sans", "Ubuntu", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Ubuntu Sans Mono", "Ubuntu Mono", ui-monospace, Menlo, monospace;
@@ -27,14 +27,14 @@
 :root[data-theme="light"] {
   --bg: #f5f6f8; --surface: rgba(255, 255, 255, .9); --surface-solid: #ffffff; --surface-2: #eef0f3; --surface-3: #e3e6ea;
   --line: #dadde2; --line-2: #c4c8cf; --text: #1c1e23; --text-2: #4d525c; --white: #0d0f13;
-  --glow: rgba(26, 95, 180, .18); --amber: #9a6700; --grid: rgba(0, 0, 0, .035); --link: #1a5fb4; --dock-bg: rgba(255, 255, 255, .82);
+  --glow: rgba(26, 95, 180, .18); --amber: #9a6700; --grid: rgba(0, 0, 0, .035); --link: #1a5fb4; --dock-bg: rgba(255, 255, 255, .97);
   color-scheme: light;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
     --bg: #f5f6f8; --surface: rgba(255, 255, 255, .9); --surface-solid: #ffffff; --surface-2: #eef0f3; --surface-3: #e3e6ea;
     --line: #dadde2; --line-2: #c4c8cf; --text: #1c1e23; --text-2: #4d525c; --white: #0d0f13;
-    --glow: rgba(26, 95, 180, .18); --amber: #9a6700; --grid: rgba(0, 0, 0, .035); --link: #1a5fb4; --dock-bg: rgba(255, 255, 255, .82);
+    --glow: rgba(26, 95, 180, .18); --amber: #9a6700; --grid: rgba(0, 0, 0, .035); --link: #1a5fb4; --dock-bg: rgba(255, 255, 255, .97);
     color-scheme: light;
   }
 }
@@ -146,11 +146,8 @@ section + section::before {
 .result p { margin: 8px 0 12px; }
 .result .src { margin-top: auto; font-size: .86rem; color: var(--text-2); }
 
-/* Glass panels with 1px edges */
-.panel {
-  background-color: var(--surface); border: 1px solid var(--line); border-radius: 8px;
-  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-}
+/* Panels with 1px edges. No backdrop blur: it repaints on every scroll and window switch. */
+.panel { background-color: var(--surface-solid); border: 1px solid var(--line); border-radius: 8px; }
 
 /* Focus bracket: corners snap onto the card you hover or focus. */
 .hud { position: relative; }
@@ -252,7 +249,6 @@ footer { padding: 28px 0 8px; color: var(--text-2); font-size: .85rem; font-fami
   bottom: calc(12px + env(safe-area-inset-bottom));
   display: flex; gap: 2px; padding: 6px; max-width: calc(100vw - 24px);
   background: var(--dock-bg); border: 1px solid var(--line); border-radius: 14px;
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
 }
 .dock a {
@@ -314,7 +310,7 @@ details p { margin: 0; }
 @media (max-width: 459px) { .crew ul { grid-template-columns: 1fr; } }
 
 /* Bolt, the pet robot arm. */
-.pet { position: fixed; left: 0; top: 0; z-index: 25; width: 64px; height: 64px; cursor: pointer; will-change: transform; --lean: 0deg; }
+.pet { position: fixed; left: 0; top: 0; z-index: 25; width: 64px; height: 64px; cursor: pointer; will-change: transform; contain: layout style; }
 .pet.parked { left: auto; top: auto; right: 12px; bottom: calc(var(--dock-h) + 30px + env(safe-area-inset-bottom)); }
 .pet svg { width: 64px; height: 64px; overflow: visible; }
 .pet-body { fill: var(--surface-2); stroke: var(--blue-light); stroke-width: 2; stroke-linecap: round; }
@@ -322,10 +318,10 @@ details p { margin: 0; }
 .pet-joint { fill: var(--blue-deep); }
 .pet-eye { fill: var(--blue-light); stroke: none; }
 .pet-claw { fill: none; }
-.pet-arm { transform-origin: 32px 52px; transform: rotate(var(--lean)); transition: transform .3s; }
+.pet-arm { transform-origin: 32px 52px; }
 .pet-head { transform-origin: 32px 30px; }
 .pet.asleep .pet-eye { transform: scaleY(.15); transform-origin: 32px 18px; fill: var(--text-2); }
-.pet.asleep .pet-arm { transform: rotate(28deg); }
+.pet.asleep .pet-arm { transform: rotate(28deg) !important; }
 .pet-bubble { position: absolute; bottom: 30px; left: 66px; display: flex; align-items: flex-start; gap: 6px; max-width: 230px; width: max-content;
   padding: 7px 8px 7px 11px; border-radius: 10px 10px 10px 2px; background: var(--surface-solid); border: 1px solid var(--line-2);
   font: .78rem/1.35 var(--mono); color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
@@ -354,3 +350,5 @@ details p { margin: 0; }
 .pet.flip .pet-chat { left: auto; right: 70px; }
 .pet.parked .pet-bubble { left: auto; right: 0; bottom: 66px; }
 .pet.parked .pet-chat { left: auto; right: 0; bottom: 66px; }
+/* Looping animations stop when nobody can see them (tab hidden or hero scrolled away). */
+.calm .agent *, .calm .agent .bar::after, .calm .console-lines li, .calm .pet-head { animation-play-state: paused !important; }

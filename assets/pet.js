@@ -137,7 +137,11 @@
     say({ run: "it ran. once. the ledger says so.", hold: "waiting for a human. could be you.", block: "BLOCKED. good. I tried that once.", down: "service down. nobody panic. it parks." }[k] || "hm.", 2600);
   });
   document.addEventListener("mouseup", function () { var t = String(getSelection()).trim(); if (t.length > 12 && Math.random() < 0.5) say("ooh, highlighting. taking notes?", 2200); });
-  document.addEventListener("visibilitychange", function () { if (!document.hidden) say(pick(["you came back!", "where did you go. I counted the pixels."]), 2400); });
+  var leftAt = 0;
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) { leftAt = Date.now(); return; }
+    if (Date.now() - leftAt > 20000) say(pick(["you came back!", "where did you go. I counted the pixels."]), 2400);
+  });
   var bottomSaid = false;
   addEventListener("scroll", function () { if (!bottomSaid && innerHeight + scrollY >= document.body.scrollHeight - 40) { bottomSaid = true; say("the end. now email him. go.", 3000); } }, { passive: true });
   setInterval(function () { if (!asleep && !chatting && !document.hidden && Math.random() < 0.25) antic(); }, 45000);
@@ -146,16 +150,19 @@
     if (!asleep && Date.now() - lastMove > 9000 && !touch) { asleep = true; pet.classList.add("asleep"); say("zzz", 999999); }
   }, 1000);
 
+  // Animate only while Bolt is catching up; stop the loop once it has arrived.
+  var arm = pet.querySelector(".pet-arm"), running = false, lastLean = 0, flipped = false;
   function tick() {
-    if (!touch) {
-      x += (tx - x) * (still ? 1 : 0.08); y += (ty - y) * (still ? 1 : 0.08);
-      var lean = Math.max(-25, Math.min(25, (tx - x) * 0.4));
-      pet.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y) + "px)";
-      pet.style.setProperty("--lean", lean + "deg");
-      pet.classList.toggle("flip", x > innerWidth - 340);
-    }
+    x += (tx - x) * (still ? 1 : 0.08); y += (ty - y) * (still ? 1 : 0.08);
+    var lean = Math.round(Math.max(-25, Math.min(25, (tx - x) * 0.4)));
+    pet.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y) + "px)";
+    if (lean !== lastLean) { arm.style.transform = "rotate(" + lean + "deg)"; lastLean = lean; }
+    var f = x > innerWidth - 340; if (f !== flipped) { pet.classList.toggle("flip", f); flipped = f; }
+    if (Math.abs(tx - x) < 0.5 && Math.abs(ty - y) < 0.5) { running = false; return; }
     requestAnimationFrame(tick);
   }
-  tick();
+  function wake() { if (!running && !touch) { running = true; requestAnimationFrame(tick); } }
+  addEventListener("mousemove", wake, { passive: true });
+  wake();
   setTimeout(function () { if (!said.top) { said.top = 1; say(pick(lines.top)); } }, 1500);
 })();
