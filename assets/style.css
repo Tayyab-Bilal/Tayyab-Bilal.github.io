@@ -343,3 +343,9 @@ details p { margin: 0; }
   @keyframes pet-spin { to { transform: rotate(360deg); } }
   @keyframes pet-snore { 50% { transform: translateY(2px) rotate(4deg); } }
 }
+.pet-chat { position: absolute; bottom: 64px; right: 10px; width: 260px; display: none; grid-template-columns: 1fr auto; gap: 6px; padding: 10px; border-radius: 10px;
+  background: var(--surface-solid); border: 1px solid var(--line-2); box-shadow: 0 12px 32px rgba(0, 0, 0, .35); cursor: default; }
+.pet.chatting .pet-chat { display: grid; }
+.pet-answer { grid-column: 1 / -1; margin: 0 0 4px; font: .8rem/1.45 var(--mono); color: var(--text); }
+.pet-chat input { min-width: 0; font: .82rem var(--sans); color: var(--text); background: var(--surface-2); border: 1px solid var(--line-2); border-radius: 6px; padding: 5px 8px; }
+.pet-chat button { font: 500 .8rem var(--sans); color: #fff; background: var(--blue-deep); border: 0; border-radius: 6px; padding: 0 10px; cursor: pointer; }
