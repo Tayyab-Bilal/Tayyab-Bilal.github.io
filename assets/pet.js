@@ -74,7 +74,10 @@
     demo: ["press the buttons. I'll watch.", "try delete_project. I dare you."],
     oss: ["1,100+ tests. I have zero. living dangerously.", "all of it is open. go poke it."],
     writing: ["he wrote about grep. I can't read."],
-    contact: ["email him. I'll wait here. forever.", "the button is right there. I can see it from here."]
+    contact: ["email him. I'll wait here. forever.", "the button is right there. I can see it from here."],
+    fit: ["if you nodded at any of these, he's your guy.", "I am also a problem. he can't fix me."],
+    offer: ["three things. he's annoyingly good at all three.", "proof under every card. he insists."],
+    process: ["step 1 is just an email. even I could do it.", "small proof first. no big scary contract."]
   };
   var clickLines = ["beep.", "*spins for no reason*", "fire? no fire. just checking.", "I dropped a bolt. it was me. I'm the bolt.", "boop."];
 
