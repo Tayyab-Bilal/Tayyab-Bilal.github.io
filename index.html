@@ -38,7 +38,7 @@
       <li>10 open-source repos</li>
       <li>1,100+ passing tests</li>
     </ul>
-    <p class="history"><strong>Now:</strong> Senior AI Engineer, SWSAM Solutions (platform in production, ~300 users) · <strong>Before:</strong> Senior ML Engineer, Transdata · ML Engineer, Quid Sol</p>
+    <p class="history"><strong>Now:</strong> Senior AI Engineer, SWSAM Solutions (platform in production with real users) · <strong>Before:</strong> Senior ML Engineer, Transdata · ML Engineer, Quid Sol</p>
     <p class="avail"><span class="dot" aria-hidden="true"></span>Open to full-time senior AI roles and scoped freelance builds.</p>
     <div class="btns">
       <a class="btn primary" href="mailto:tayyaib055766@gmail.com">Email me</a>
@@ -78,7 +78,7 @@
     <ul class="results">
       <li class="result panel hud">
         <span class="big">~77% cheaper</span>
-        <p>Planner about 77% cheaper after a model switch, with 24/24 benchmark and 20/20 end-to-end runs passing.</p>
+        <p>Planner about 77% cheaper after a model switch, passing every benchmark and end-to-end case.</p>
         <span class="src">Autonomous planner, SWSAM.</span>
       </li>
       <li class="result panel hud">
@@ -88,7 +88,7 @@
       </li>
       <li class="result panel hud">
         <span class="big">~80% lower inference cost</span>
-        <p>Fine-tuned Qwen 7B with QLoRA (over 95% accuracy) and served it in 4-bit on AWS GPUs, for enterprise conversational AI.</p>
+        <p>Fine-tuned Qwen 7B with QLoRA (over 95% accuracy) and served it in 4-bit on AWS GPUs for ~80% lower cost and 5&times; throughput, for enterprise conversational AI.</p>
         <span class="src">Transdata. The 114-attack injection suite is in <a href="#case-kit">case 2</a></span>
       </li>
     </ul>
@@ -103,7 +103,7 @@
         <span class="when">Apr 2026 to now</span>
         <div>
           <h3>Senior AI Engineer, SWSAM Solutions</h3>
-          <p>AI workspace platform for a client, in production in early release with about 300 users. Led a team of engineers. Top contributor to the AI service. Built the autonomous planner and executor, the approval gate, the discovery agent and AI credit metering. Primary code reviewer.</p>
+          <p>AI workspace platform for a client, in production in early release with real users. Led a team of engineers. #1 contributor to the platform's codebase (~30% of 345K lines) within 5.5 months. Built the autonomous planner and executor, the approval gate, the discovery agent and AI credit metering. Primary code reviewer, catching cross-tenant security bugs. Made PR builds about 3&times; faster (11m20s to 3m44s) with zero changed test results.</p>
           <ul class="tags"><li>Python</li><li>LangGraph</li><li>FastAPI</li><li>PostgreSQL</li><li>CloudEvents</li><li>pytest</li></ul>
         </div>
       </li>
@@ -111,7 +111,7 @@
         <span class="when">Nov 2024 to Apr 2026</span>
         <div>
           <h3>Senior Machine Learning Engineer, Transdata</h3>
-          <p>Conversational AI and reporting systems for enterprise clients. Split an agent proof of concept into microservices. Cut inference cost about 80% by serving a 4-bit QLoRA Qwen 7B model.</p>
+          <p>Conversational AI and reporting systems for enterprise clients. Split an agent proof of concept into microservices. Cut inference cost about 80%, with 5&times; throughput, by serving a 4-bit QLoRA Qwen 7B model. 99.5% uptime for the production conversational AI system. Deployments cut from 2+ hours to under 15 minutes.</p>
           <ul class="tags"><li>AWS Bedrock</li><li>Azure OpenAI</li><li>Qwen 7B</li><li>QLoRA</li><li>pgvector</li><li>Microservices</li></ul>
         </div>
       </li>
@@ -141,8 +141,9 @@
       <li><a href="#case-gate"><span class="badge live">In production</span><b>Approval gate</b><span class="num">31 write tools, one checkpoint</span></a></li>
       <li><a href="#case-auto"><span class="badge live">In production</span><b>Autonomous planner</b><span class="num">~77% cheaper per plan</span></a></li>
       <li><a href="#writing"><span class="badge live">In production</span><b>Grep-first discovery agent</b><span class="num">1 to 2 min &rarr; ~16 s</span></a></li>
-      <li><a href="#case-kit"><span class="badge pre">Built, pre-release</span><b>Agent kit</b><span class="num">114 attacks, 7 holes closed</span></a></li>
-      <li><a href="#experience"><span class="badge live">Shipped</span><b>Qwen 7B serving, Transdata</b><span class="num">~80% lower inference cost</span></a></li>
+      <li><a href="#case-kit"><span class="badge pre">Built, pre-release</span><b>Agent kit</b><span class="num">114 attacks, every hole closed</span></a></li>
+      <li><a href="#experience"><span class="badge live">Shipped</span><b>Qwen 7B serving, Transdata</b><span class="num">~80% lower cost, 5&times; throughput</span></a></li>
+      <li><a href="#experience"><span class="badge live">In production</span><b>Change-aware CI</b><span class="num">~3&times; faster PR builds, 0 test results changed</span></a></li>
       <li><a href="#case-rag"><span class="badge oss">Design</span><b>Three-Hook RAG evaluation</b><span class="num">Four dimensions, three hooks</span></a></li>
     </ul>
     <h3 class="sub-h">Case studies</h3>
@@ -184,7 +185,7 @@
         <p class="kicker">Case 2 · Prompt-injection defence</p>
         <h3>A runtime where safety lives in code, not in the prompt</h3>
         <p class="plain">In plain terms: even when a document tries to trick the AI, the code, not the AI, decides what it is allowed to do.</p>
-        <p class="outcome"><strong>Outcome:</strong> A 114-attack suite closed 7 prompt-injection holes. 17/17 parity with the old workflow builder, up from 12/17.</p>
+        <p class="outcome"><strong>Outcome:</strong> Closed every hole a 114-attack injection suite found. Full parity with the old workflow builder, up from about 70%.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
@@ -214,7 +215,7 @@
         <p class="kicker">Case 3 · Autonomous agent</p>
         <h3>A planner and executor that run with nobody watching</h3>
         <p class="plain">In plain terms: a user describes a recurring job in one sentence, and the agent plans it and runs it on its own, safely.</p>
-        <p class="outcome"><strong>Outcome:</strong> Planner about 77% cheaper, with 24/24 benchmark and 20/20 end-to-end runs passing after the switch. I analysed 320 QA runs (92% completed) and fed the findings into a hardening list.</p>
+        <p class="outcome"><strong>Outcome:</strong> Planner about 77% cheaper, passing every benchmark and end-to-end case after the switch. I analysed 320 QA runs and turned every failure into a hardening fix.</p>
       </header>
       <div class="case-grid">
         <dl class="report">

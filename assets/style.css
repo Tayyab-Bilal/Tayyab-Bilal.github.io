@@ -361,6 +361,7 @@ details p { margin: 0; }
 .systems { list-style: none; padding: 0; margin: 0 0 40px; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
 .systems a { display: grid; gap: 4px; height: 100%; padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-solid); text-decoration: none; color: var(--text); transition: border-color .15s, transform .15s; }
 .systems a:hover { border-color: var(--blue-deep); transform: translateY(-2px); }
+.systems li:last-child { grid-column: 1 / -1; } /* odd card out fills its row */
 .systems b { font-size: 1.05rem; color: var(--white); }
 .systems .num { font: 1rem var(--sans); color: var(--text-2); }
 .badge { justify-self: start; font: .7rem var(--mono); text-transform: uppercase; letter-spacing: .08em; padding: 2px 8px; border-radius: 99px; border: 1px solid; }

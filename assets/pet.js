@@ -25,14 +25,16 @@
   var facts = [
     ["who tayyab about intro senior ai engineer years experience long", "Senior AI Engineer in Lahore. 5 years in ML and AI, about 4 of them building agents."],
     ["agents langgraph react rasa agent experience", "about 4 years of agents: Rasa state machines, then hand-written ReAct loops, now LangGraph."],
-    ["current job swsam now production users", "now: Senior AI Engineer at SWSAM. the platform is in production, early release, about 300 users. he leads a team of engineers."],
-    ["transdata previous job before qwen fine tune fine-tuning qlora inference cost", "at Transdata he fine-tuned Qwen 7B with QLoRA (over 95% accuracy) and cut inference cost about 80% serving it in 4-bit on AWS GPUs."],
+    ["current job swsam now production users", "now: Senior AI Engineer at SWSAM. the platform is in production with real users, early release. he leads a team of engineers."],
+    ["transdata previous job before qwen fine tune fine-tuning qlora inference cost", "at Transdata he fine-tuned Qwen 7B with QLoRA (over 95% accuracy) and cut inference cost about 80% with 5x throughput, serving it in 4-bit on AWS GPUs."],
     ["quid sol first job chatbots healthcare fintech", "at Quid Sol (2022 to 2024) he built ML apps and chatbots, Rasa assistants, then ReAct agents by hand."],
     ["rag retrieval evaluation eval evals ragas faithfulness", "RAG: yes. he designed a Three-Hook evaluation model (every query, a sampled judge, a CI golden set)."],
     ["approval gate human in the loop permissions safety guardrails write delete", "the approval gate: every write tool goes through one checkpoint. Autonomous, Suggest Only or Disabled per action. deletes are denied on purpose."],
-    ["prompt injection security attack attacks red team", "a 114-attack prompt-injection suite closed 7 holes in his agent kit. that kit is built, not shipped yet."],
-    ["cost cheaper model switch planner sonnet 77", "the planner got about 77% cheaper after a model switch, with 24/24 benchmark and 20/20 end-to-end runs passing."],
-    ["search grep vector database fast 16 seconds", "grep-first search: finding the right record went from 1 to 2 minutes to about 16 seconds. he wrote a post on it."],
+    ["prompt injection security attack attacks red team", "his agent kit closed every hole a 114-attack injection suite found. that kit is built, not shipped yet."],
+    ["cost cheaper model switch planner sonnet 77", "the planner got about 77% cheaper after a model switch, passing every benchmark and end-to-end case."],
+    ["contributor codebase lines commits senior impact reviewer", "he is the #1 contributor to the SWSAM platform's codebase, about 30% of 345K lines, within 5.5 months. he is also the primary code reviewer, catching cross-tenant security bugs."],
+  ["ci pipeline build devops faster tests", "he made PR builds about 3x faster (11m20s to 3m44s) with zero changed test results."],
+  ["search grep vector database fast 16 seconds", "grep-first search: finding the right record went from 1 to 2 minutes to about 16 seconds. he wrote a post on it."],
     ["backend python fastapi postgres postgresql redis stack api apis build services", "backend: Python, FastAPI, PostgreSQL, Redis, Qdrant, pytest, GitHub Actions. strong backend side, not just prompts."],
     ["ai coding tools claude code codex cursor stack other stacks fast build", "he ships with Claude Code, Codex, OpenCode, a DeepSeek harness, T3 Code and local Ollama models. AI-accelerated on any stack."],
     ["open source github repos code tests", "10 public repos, 1,100+ passing tests. libraries he maintains in the open."],
@@ -66,7 +68,7 @@
 
   var lines = {
     top: ["hi. I'm Bolt. I follow people.", "he made me. I'm the least tested thing here.", "scroll. go on. I'll come with you."],
-    experience: ["5 years. I've been around for 5 minutes.", "SWSAM: 300 people use his stuff. none of them have met me."],
+    experience: ["5 years. I've been around for 5 minutes.", "SWSAM: real people use his stuff. none of them have met me."],
     "case-gate": ["this is the thing that stops me deleting things.", "I asked for delete rights. denied. on purpose."],
     "case-kit": ["114 attacks. I tried a 115th. it didn't work.", "the code decides, not the model. rude, but fair."],
     "case-auto": ["it runs at 3 a.m. with nobody watching. like me.", "77% cheaper. I'm free, for the record."],
@@ -101,10 +103,21 @@
     Object.keys(lines).forEach(function (id) { var el = document.getElementById(id); if (el) io.observe(el); });
   }
 
+  // While the bubble is up, a pointer heading for it (or just near it) freezes Bolt so the "ask me" button stays put.
+  var lastD = 1e9;
+  function approaching(e) {
+    if (!pet.classList.contains("talking")) { lastD = 1e9; return false; }
+    var r = bubble.parentNode.getBoundingClientRect(), dx = Math.max(r.left - e.clientX, 0, e.clientX - r.right), dy = Math.max(r.top - e.clientY, 0, e.clientY - r.bottom);
+    var d = Math.hypot(dx, dy), near = d < 40 || (d < 400 && d < lastD);
+    lastD = d;
+    if (near) { tx = x; ty = y; }
+    return near;
+  }
+
   if (!touch) {
     addEventListener("mousemove", function (e) {
       // Clingy but catchable: once the cursor is on top of Bolt, it holds still so you can click it.
-      if (hover || Date.now() < holdUntil || chatting || Math.hypot(e.clientX - (x + 32), e.clientY - (y + 32)) < 44) { lastMove = Date.now(); return; }
+      if (approaching(e) || hover || Date.now() < holdUntil || chatting || Math.hypot(e.clientX - (x + 32), e.clientY - (y + 32)) < 44) { lastMove = Date.now(); return; }
       var dx = e.clientX + 28 - tx, dy = e.clientY + 22 - ty;
       speed = speed * 0.8 + Math.hypot(dx, dy) * 0.2;
       tx = e.clientX + 28; ty = e.clientY + 22; lastMove = Date.now();
