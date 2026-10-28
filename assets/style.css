@@ -244,7 +244,9 @@ legend { margin-bottom: 10px; }
 
 footer { padding: 28px 0 8px; color: var(--text-2); font-size: .85rem; font-family: var(--mono); border-top: 1px solid var(--line); }
 
-/* Floating bottom dock, like his desktop */
+/* Floating bottom dock, like his desktop. Hidden on the first screen so it never covers the hero. */
+.dock { transition: opacity .2s, transform .2s; }
+.dock.away { opacity: 0; pointer-events: none; transform: translate(-50%, 20px); }
 .dock {
   position: fixed; left: 50%; transform: translateX(-50%); z-index: 20;
   bottom: calc(12px + env(safe-area-inset-bottom));
@@ -273,7 +275,6 @@ details p { margin: 0; }
   .diagram { padding: 12px; }
   .diagram img { display: none; }
   .diagram::after { content: "Open the diagram full size \2197"; font-weight: 500; }
-  .dock { transition: opacity .2s, transform .2s; }
-  .dock.away { opacity: 0; pointer-events: none; transform: translate(-50%, 20px); }
+
   body { padding-bottom: calc(var(--dock-h) + 72px + env(safe-area-inset-bottom)); }
 }
