@@ -269,8 +269,8 @@ details p { margin: 0; }
 /* Small screens: labels would be unreadable, so show a link to the full diagram instead. */
 @media (max-width: 719px) {
   .diagram { padding: 12px; }
-  .diagram img { display: none; }
-  .diagram::after { content: "Open the diagram full size \2197"; font-weight: 500; }
+  .diagram { overflow-x: auto; }
+  .diagram img { min-width: 520px; }
 
   body { padding-bottom: calc(var(--dock-h) + 72px + env(safe-area-inset-bottom)); }
 }

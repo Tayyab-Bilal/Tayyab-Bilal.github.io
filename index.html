@@ -233,8 +233,9 @@
           <dt>Trade-off and what failed</dt>
           <dd><details><summary>Show what failed and why</summary><p>The planner was quietly running on the platform's default model, because the service was never registered for model selection. I fixed the routing and moved it to a cheaper model. Each planning call got about 55% slower, which is fine because planning runs in the background.</p></details></dd>
         </dl>
-        <figure class="strip-fig">
-          <ol class="strip"><li>Claim the run atomically, one owner only</li><li>Run steps with turn and write budgets</li><li>Hold at the approval gate, park on any failure</li><li>Resume skips writes already done</li></ol>
+        <figure>
+          <div class="diagram"><img src="assets/run-states.svg" width="768" height="371" style="max-width:620px" loading="lazy" alt="Run states: pending moves to running on an atomic claim. Running ends completed or failed, waits in awaiting_approval when the gate holds, or is parked on budget, transient failure, loop, crash, cancel or the reaper. A human decision or a resume returns it to running, and writes already done are skipped."></div>
+          <figcaption>Run states of an autonomous run.</figcaption>
         </figure>
       </div>
     </article>
@@ -314,7 +315,7 @@
 <section id="oss">
   <div class="wrap">
     <h2>Open source</h2>
-    <p class="lede">Libraries and reference implementations I maintain in the open. Test counts are from running each suite.</p>
+    <p class="lede">Libraries and reference implementations I maintain in the open. Test counts are from running each suite. <a href="https://github.com/Tayyab-Bilal">All of it on GitHub</a>.</p>
     <ul class="repos">
       <li class="repo panel hud">
         <h3>agent-guardrails</h3>
