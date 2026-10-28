@@ -4,14 +4,12 @@
   if (typeof document === "undefined") return;
   var still = matchMedia("(prefers-reduced-motion: reduce)").matches;
   var touch = matchMedia("(pointer: coarse)").matches;
-  // Bed is for this visit only (sessionStorage). Drop the old permanent flag so Bolt comes back.
-  var bedded = false, wakeBtn = document.getElementById("wake-bolt");
-  try { localStorage.removeItem("pet"); bedded = sessionStorage.getItem("pet") === "off"; } catch (e) {}
+  try { localStorage.removeItem("pet"); } catch (e) {} // old "send to bed" flag: Bolt never sleeps in
 
   var pet = document.createElement("div");
   pet.className = "pet" + (touch ? " parked" : "");
   pet.innerHTML =
-    '<div class="pet-bubble"><span></span><button type="button" class="pet-ask">ask me</button><button type="button" class="pet-bed" tabindex="-1" title="Send Bolt to bed">×</button></div>' +
+    '<div class="pet-bubble"><span></span><button type="button" class="pet-ask">ask me</button></div>' +
     '<svg viewBox="0 0 64 64" aria-hidden="true"><g class="pet-body">' +
     '<rect x="16" y="50" width="32" height="8" rx="3" class="pet-base"/>' +
     '<g class="pet-arm"><rect x="28" y="30" width="8" height="22" rx="4"/><circle cx="32" cy="30" r="5" class="pet-joint"/>' +
@@ -135,7 +133,7 @@
     });
   }
 
-  // Click Bolt: it does something weird. The "ask me" button in its bubble opens the chat. × sends it to bed.
+  // Click Bolt: it does something weird. The "ask me" button in its bubble opens the chat.
   function openChat() { chatting = true; pet.classList.add("chatting"); pet.classList.remove("talking"); setTimeout(function () { chat.q.focus(); }, 50); }
   // Hovering Bolt brings up its bubble, so the "ask me" button is always one hover away.
   // It also freezes in place, and keeps still for a moment after the pointer leaves so a diagonal path to the button works.
@@ -149,12 +147,6 @@
     if (pet.classList.contains("talking")) say(bubble.textContent, 1800);
   });
   pet.addEventListener("click", function (e) {
-    var bedBtn = e.target.closest(".pet-bed");
-    if (bedBtn) {
-      // Two clicks to send Bolt to bed, so a slip next to "ask me" does nothing.
-      if (!bedBtn.dataset.sure) { bedBtn.dataset.sure = 1; bedBtn.textContent = "bed?"; setTimeout(function () { delete bedBtn.dataset.sure; bedBtn.textContent = "\u00d7"; }, 2500); return; }
-      say("fine. goodnight.", 1200); setTimeout(function () { sleepIn(true); }, 1200); return;
-    }
     if (e.target.closest(".pet-ask")) { openChat(); return; }
     if (chat.contains(e.target)) return;
     if (chatting) { closeChat(); return; }
@@ -168,15 +160,6 @@
     if (!deck.length) { deck = all.slice(); for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; } }
     return deck.pop();
   }
-  // Bed hides Bolt for this visit; the footer "wake Bolt" button brings it back.
-  function sleepIn(on) {
-    pet.classList.toggle("bed", on); if (wakeBtn) wakeBtn.hidden = !on;
-    try { on ? sessionStorage.setItem("pet", "off") : sessionStorage.removeItem("pet"); } catch (err) {}
-    if (!on) { lastMove = Date.now(); asleep = false; pet.classList.remove("asleep"); say("I'm back. did you miss me. you did.", 3200); }
-    var b = pet.querySelector(".pet-bed"); delete b.dataset.sure; b.textContent = "\u00d7";
-  }
-  if (wakeBtn) wakeBtn.addEventListener("click", function () { sleepIn(false); });
-  if (bedded) sleepIn(true);
   function antic() { pet.classList.remove("spin"); void pet.offsetWidth; pet.classList.add("spin"); say(clickLine(), 2800); }
 
   // More reactions to what the visitor does.
