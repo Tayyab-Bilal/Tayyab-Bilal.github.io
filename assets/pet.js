@@ -54,7 +54,7 @@
     if (!api) { setTimeout(function () { answer.textContent = local; }, 400); return; }
     // Model proposes, code decides: the AI only rephrases facts we pass it; any error falls back to grep.
     var done = false, t = setTimeout(function () { if (!done) { done = true; answer.textContent = local; } }, 6000);
-    fetch(api, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: q, facts: g.all.map(function (f) { return f[1]; }) }) })
+    fetch(api, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: q }) })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
       .then(function (d) { if (!done) { done = true; clearTimeout(t); answer.textContent = (d && d.answer) || local; } })
       .catch(function () { if (!done) { done = true; clearTimeout(t); answer.textContent = local; } });
