@@ -8,7 +8,7 @@
   --line: #30333b;
   --line-2: #3e424b;
   --text: #e6e6e6;
-  --text-2: #a8a8a8;
+  --text-2: #c2c5cb;
   --white: #ffffff;
   --blue: #3584e4;
   --blue-light: #62a0ea;
@@ -88,6 +88,15 @@ section + section::before {
 .theme-toggle:hover { color: var(--text); background: var(--surface-2); }
 .hero .history { color: var(--text-2); font-size: .95rem; margin: 0 0 20px; }
 .hero .history strong { color: var(--text); font-weight: 600; }
+.case .outcome { margin: 10px 0 0; max-width: 70ch; }
+.case .outcome strong { color: var(--white); }
+.strip { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: 10px; }
+@media (min-width: 720px) { .strip { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); grid-auto-flow: column; } }
+.strip li { counter-increment: s; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; font-size: .95rem; line-height: 1.45; }
+.strip li::before { content: counter(s); display: block; font: 600 .8rem var(--mono); color: var(--link); margin-bottom: 4px; }
+.fulldiag { display: inline-block; margin-top: 10px; font-size: .9rem; }
+:root[data-theme="light"] .diagram { background: #fff; } :root[data-theme="light"] .diagram img { filter: invert(1) hue-rotate(180deg); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .diagram { background: #fff; } :root:not([data-theme="dark"]) .diagram img { filter: invert(1) hue-rotate(180deg); } }
 .case .plain { margin: 8px 0 0; color: var(--text); font-size: 1.02rem; max-width: 70ch; border-left: 3px solid var(--blue); padding-left: 12px; }
 .hero .role { font-size: clamp(1.15rem, 2.6vw, 1.45rem); font-weight: 500; margin: 16px 0 8px; max-width: 34ch; }
 .hero .sub { color: var(--text-2); max-width: 62ch; margin: 0 0 22px; }
@@ -237,5 +246,7 @@ details p { margin: 0; }
   .diagram { padding: 12px; }
   .diagram img { display: none; }
   .diagram::after { content: "Open the diagram full size \2197"; font-weight: 500; }
+  .dock { transition: opacity .2s, transform .2s; }
+  .dock.away { opacity: 0; pointer-events: none; transform: translate(-50%, 20px); }
   body { padding-bottom: calc(var(--dock-h) + 72px + env(safe-area-inset-bottom)); }
 }

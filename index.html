@@ -35,12 +35,12 @@
       <li>10 open-source repos</li>
       <li>1,100+ passing tests</li>
     </ul>
-    <p class="history"><strong>Now:</strong> Senior AI Engineer, SWSAM Solutions · <strong>Before:</strong> Senior ML Engineer, Transdata · ML Engineer, Quid Sol</p>
+    <p class="history"><strong>Now:</strong> Senior AI Engineer, SWSAM Solutions (platform in production, ~300 users) · <strong>Before:</strong> Senior ML Engineer, Transdata · ML Engineer, Quid Sol</p>
     <div class="btns">
       <a class="btn primary" href="mailto:tayyaib055766@gmail.com">Email me</a>
       <a class="btn" href="https://github.com/Tayyab-Bilal">GitHub</a>
       <a class="btn" href="https://www.linkedin.com/in/tayyab-bilal-79b509187/">LinkedIn</a>
-      <!-- CV button: add cv.pdf to the site root, then restore: <a class="btn" href="cv.pdf">CV</a> -->
+      <a class="btn" href="cv.pdf" download="Tayyab-Bilal-CV.pdf">Download CV</a>
     </div>
 
     <h2 class="results-title">Three measured results</h2>
@@ -109,6 +109,7 @@
         <p class="kicker">Case 1 · Human-in-the-loop</p>
         <h3>An approval gate between the agent and every write</h3>
         <p class="plain">In plain terms: the AI can only change company data when that company's settings allow it, and a person can approve each change before it happens.</p>
+        <p class="outcome"><strong>Outcome:</strong> All 31 write tools go through one checkpoint, and a CI test fails if a new write tool is not classified. Public version: 95 tests.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
@@ -126,14 +127,10 @@
           </ul></details></dd>
           <dt>Trade-off and what failed</dt>
           <dd><details><summary>Show what failed and why</summary><p>An outage used to show up as "disabled in your settings", so users went to check settings that were fine. I split unavailable, misconfigured and disabled into three answers. I also tried LangGraph <code>interrupt()</code>: nested agents without checkpointers never passed the interrupt up, so I kept durable drafts instead.</p></details></dd>
-          <dt>Outcome</dt>
-          <dd>All 31 write tools go through one checkpoint, and a CI test fails if a new write tool is not classified. Public version: 95 tests.</dd>
         </dl>
-        <figure>
-          <a class="diagram" href="assets/approval-gate.svg" aria-label="Open the approval gate diagram full size">
-            <img src="assets/approval-gate.svg" width="1118" height="1513" style="max-width:820px" loading="lazy" alt="Flow chart: a proposed write first checks for an existing draft, where a human answer wins. Unmapped or denied tools are blocked with no lookup. Otherwise permissions load fresh: an outage parks the run as unavailable, a bad payload is misconfigured. Autonomous claims a ledger row and runs once, Suggest Only stores a signed draft for one human decision and exact replay, Disabled is blocked.">
-          </a>
-          <figcaption>One gated call, condensed from the agent-guardrails README. Click to enlarge.</figcaption>
+        <figure class="strip-fig">
+          <ol class="strip"><li>Agent proposes a write</li><li>Is the tool mapped? No: blocked, no lookup</li><li>Load the org setting fresh</li><li>Run once · Hold for a human · Block</li></ol>
+          <a class="fulldiag" href="assets/approval-gate.svg">Open the full diagram &#8599;</a>
         </figure>
       </div>
       <a class="readcode" href="https://github.com/Tayyab-Bilal/agent-guardrails">Read the code: agent-guardrails</a> · <a href="#demo">Try the gate below</a>
@@ -144,6 +141,7 @@
         <p class="kicker">Case 2 · Prompt-injection defence</p>
         <h3>A runtime where safety lives in code, not in the prompt</h3>
         <p class="plain">In plain terms: even when a document tries to trick the AI, the code, not the AI, decides what it is allowed to do.</p>
+        <p class="outcome"><strong>Outcome:</strong> A 114-attack suite closed 7 prompt-injection holes. 17/17 parity with the old workflow builder, up from 12/17. Public version: 184 tests, 20 of them attacks.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
@@ -161,14 +159,10 @@
           </ul></details></dd>
           <dt>Trade-off and what failed</dt>
           <dd><details><summary>Show what failed and why</summary><p>I tried a Pyodide (WASM) sandbox for the model's queries and rejected it: about 3 s cold start, about 350 MB, and no real isolation. The agent is about 2.6x slower than the old builder and uses 12 to 13x the tokens. The judge is strict, so a polite "yes, thanks" cancels.</p></details></dd>
-          <dt>Outcome</dt>
-          <dd>A 114-attack suite closed 7 prompt-injection holes. 17/17 parity with the old workflow builder, up from 12/17. Public version: 184 tests, 20 of them attacks.</dd>
         </dl>
-        <figure>
-          <a class="diagram" href="assets/agent-kit.svg" aria-label="Open the agent kit diagram full size">
-            <img src="assets/agent-kit.svg" width="1387" height="792"  loading="lazy" alt="Flow diagram: the orchestrator delegates to a runner with a ReAct loop and budgets. The runner opens an allow-list as the user, stores big results in SQLite, routes writes through a guard with a ledger, and sends risky actions to a confirm gate. On the next turn a consent judge sees only the user's reply, and only a yes with unchanged data runs the stored arguments.">
-          </a>
-          <figcaption>The agent-kit runtime, from its README. Click to enlarge.</figcaption>
+        <figure class="strip-fig">
+          <ol class="strip"><li>Orchestrator hands the task to a runner</li><li>Runner works inside an allow-list and budgets</li><li>Writes go through a guard, risky ones wait for a clear yes</li><li>Only the stored arguments run</li></ol>
+          <a class="fulldiag" href="assets/agent-kit.svg">Open the full diagram &#8599;</a>
         </figure>
       </div>
       <a class="readcode" href="https://github.com/Tayyab-Bilal/agent-kit">Read the code: agent-kit</a>
@@ -179,6 +173,7 @@
         <p class="kicker">Case 3 · Autonomous agent</p>
         <h3>A planner and executor that run with nobody watching</h3>
         <p class="plain">In plain terms: a user describes a recurring job in one sentence, and the agent plans it and runs it on its own, safely.</p>
+        <p class="outcome"><strong>Outcome:</strong> Planner about 77% cheaper, with 24/24 benchmark and 20/20 end-to-end runs passing after the switch. I analysed 320 QA runs (92% completed) and fed the findings into a hardening list. Public version: 148 tests.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
@@ -196,12 +191,10 @@
           </ul></details></dd>
           <dt>Trade-off and what failed</dt>
           <dd><details><summary>Show what failed and why</summary><p>The planner was quietly running on the platform's default model, because the service was never registered for model selection. I fixed the routing and moved it to a cheaper model. Each planning call got about 55% slower, which is fine because planning runs in the background.</p></details></dd>
-          <dt>Outcome</dt>
-          <dd>Planner about 77% cheaper, with 24/24 benchmark and 20/20 end-to-end runs passing after the switch. I analysed 320 QA runs (92% completed) and fed the findings into a hardening list. Public version: 148 tests.</dd>
         </dl>
         <figure>
           <a class="diagram" href="assets/autonomous-agent.svg" aria-label="Open the run state diagram full size">
-            <img src="assets/autonomous-agent.svg" width="768" height="371" style="max-width:768px" loading="lazy" alt="Run states: pending moves to running on an atomic claim. Running ends completed or failed, waits in awaiting_approval when the gate holds, or is parked on budget, transient failure, loop, crash, cancel or the reaper. A human decision or a resume returns it to running, and the ledger skips writes already done.">
+            <img src="assets/autonomous-agent.svg" width="768" height="371" style="max-width:620px" loading="lazy" alt="Run states: pending moves to running on an atomic claim. Running ends completed or failed, waits in awaiting_approval when the gate holds, or is parked on budget, transient failure, loop, crash, cancel or the reaper. A human decision or a resume returns it to running, and the ledger skips writes already done.">
           </a>
           <figcaption>Run states, redrawn from the autonomous-agent README. Click to enlarge.</figcaption>
         </figure>
@@ -214,6 +207,7 @@
         <p class="kicker">Case 4 · RAG evaluation</p>
         <h3>The Three-Hook Model: each check runs where its cost fits</h3>
         <p class="plain">In plain terms: automatic checks that catch it when an AI search-and-answer system starts giving worse answers.</p>
+        <p class="outcome"><strong>Outcome:</strong> A CI gate that cannot switch itself off: an unmeasured threshold or a typo in the threshold file fails. Public version: 165 tests.</p>
       </header>
       <div class="case-grid">
         <dl class="report">
@@ -231,14 +225,10 @@
           </ul></details></dd>
           <dt>Trade-off and what failed</dt>
           <dd><details><summary>Show what failed and why</summary><p>In review I found that the "context" being judged was an intermediate answer, not the retrieved chunks, so the scores compared one answer with another. Hook 2 now checks that every context is a chunk the retriever really returned. A text check alone cannot catch a reworded answer.</p></details></dd>
-          <dt>Outcome</dt>
-          <dd>A CI gate that cannot switch itself off: an unmeasured threshold or a typo in the threshold file fails. Public version: 165 tests.</dd>
         </dl>
-        <figure>
-          <a class="diagram" href="assets/rag-three-hooks.svg" aria-label="Open the three-hook diagram full size">
-            <img src="assets/rag-three-hooks.svg" width="831" height="964" style="max-width:700px" loading="lazy" alt="Flow diagram: a query goes to the retriever and generator. Hook 1 records stats on every call. Hook 2 samples answers after they are sent and checks raw chunks, then a batch judges and scores them for drift. Hook 3 runs a golden set from git through thresholds and a baseline to a CI exit code.">
-          </a>
-          <figcaption>The three hooks, from the rag-quality-monitor README. Click to enlarge.</figcaption>
+        <figure class="strip-fig">
+          <ol class="strip"><li>Hook 1 · every query: cheap stats, no LLM</li><li>Hook 2 · a sample, after the answer is sent: judged in the background</li><li>Hook 3 · every PR: golden set must not get worse</li></ol>
+          <a class="fulldiag" href="assets/rag-three-hooks.svg">Open the full diagram &#8599;</a>
         </figure>
       </div>
       <a class="readcode" href="https://github.com/Tayyab-Bilal/rag-quality-monitor">Read the code: rag-quality-monitor</a>

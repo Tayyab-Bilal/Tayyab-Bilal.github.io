@@ -79,6 +79,12 @@ if (typeof document !== "undefined") {
   });
   label();
 
+  // Phone: keep the dock out of the way on the first screen.
+  var dock = document.querySelector(".dock"), hero = document.getElementById("top");
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (e) { dock.classList.toggle("away", e[0].isIntersecting); }, { threshold: 0.35 }).observe(hero);
+  }
+
   // Copy email.
   var copyBtn = document.getElementById("copy-email");
   var copyStatus = document.getElementById("copy-status");
