@@ -202,8 +202,16 @@ legend { margin-bottom: 10px; }
 .opts input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .opts span {
   display: inline-block; padding: 5px 12px; border: 1px solid var(--line-2); border-radius: 6px; cursor: pointer;
-  font-family: var(--mono); font-size: .88rem; background: var(--surface-2); color: var(--text);
+  font-size: .92rem; background: var(--surface-2); color: var(--text); line-height: 1.3;
 }
+.opts span b { display: block; font-weight: 600; }
+.opts span small { display: block; margin-top: 2px; font-size: .78rem; color: var(--text-2); }
+.opts input:checked + span small { color: rgba(255, 255, 255, .85); }
+.recap { margin: 0 0 12px; color: var(--text-2); font-size: .92rem; }
+.steps { margin-top: 16px; padding-left: 19px; }
+.steps summary { cursor: pointer; color: var(--link); font-size: .9rem; }
+.steps summary:focus-visible { outline: 2px solid var(--blue-light); outline-offset: 3px; }
+.steps .term { margin-top: 10px; }
 .opts span:hover { background: var(--surface-3); }
 .opts input:checked + span { background: var(--blue-deep); border-color: var(--blue-deep); color: #fff; }
 .opts input:focus-visible + span { outline: 2px solid var(--blue-light); outline-offset: 3px; }

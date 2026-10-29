@@ -126,7 +126,10 @@ if (typeof document !== "undefined") {
     var d = decide(tool, mode);
     var v = document.getElementById("verdict");
     v.dataset.kind = d.kind;
-    v.querySelector(".label").textContent = d.label;
+    var HEAD = { run: "Runs right away", hold: "Held for a person to approve", block: "Blocked", down: "Paused: settings service is down" };
+    function pick(n) { return form.querySelector("input[name=" + n + "]:checked").nextElementSibling.firstChild.textContent; }
+    document.getElementById("recap").textContent = "You chose: " + pick("tool") + ", with the setting \u201c" + pick("mode") + "\u201d.";
+    v.querySelector(".label").textContent = HEAD[d.kind];
     v.querySelector(".reason").textContent = d.reason;
     var ol = document.getElementById("trace");
     ol.innerHTML = "";
