@@ -62,7 +62,7 @@
       .catch(function () { if (!done) { done = true; clearTimeout(t); answer.textContent = local; } });
   }
   chat.addEventListener("submit", function (e) { e.preventDefault(); var q = chat.q.value.trim(); if (q) ask(q); });
-  function closeChat() { chatting = false; pet.classList.remove("chatting"); }
+  function closeChat() { chatting = false; pet.classList.remove("chatting"); setReach(false); follow(); }
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && chatting) closeChat(); });
   document.addEventListener("click", function (e) { if (chatting && !pet.contains(e.target)) closeChat(); });
 
@@ -83,12 +83,14 @@
   };
   var clickLines = ["beep.", "*spins for no reason*", "fire? no fire. just checking.", "I dropped a bolt. it was me. I'm the bolt.", "boop."];
 
-  var tx = innerWidth - 120, ty = innerHeight - 140, x = tx, y = ty, lastMove = Date.now(), said = {}, hideT, asleep = false, hover = false, holdUntil = 0;
+  var tx = innerWidth - 120, ty = innerHeight - 140, x = tx, y = ty, lastMove = Date.now(), said = {}, hideT, asleep = false, hover = false, reach = false;
+  // Reach = the user deliberately touched Bolt (or its "ask me" button): only then does the bubble area hold Bolt still.
+  function setReach(v) { reach = v; pet.classList.toggle("reach", v); }
 
   // The bubble stays up while the pointer is on Bolt, its bubble or its chat (they are all inside .pet).
   function say(t, ms) {
     bubble.textContent = t; rel = null; pet.classList.add("talking");
-    clearTimeout(hideT); hideT = setTimeout(function () { if (hover) return say(bubble.textContent, 1500); pet.classList.remove("talking"); }, ms || 3600);
+    clearTimeout(hideT); hideT = setTimeout(function () { if (hover) return say(bubble.textContent, 1500); pet.classList.remove("talking"); setReach(false); follow(); }, ms || 3600);
   }
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
 
@@ -103,30 +105,47 @@
     Object.keys(lines).forEach(function (id) { var el = document.getElementById(id); if (el) io.observe(el); });
   }
 
-  // While the bubble is up, a pointer within 60px of it freezes Bolt so the "ask me" button stays put.
+  // In reach mode, a pointer within 24px of the bubble holds Bolt still so the "ask me" button stays put.
   var rel = null, enterT;
-  function nearBubble(e) {
-    if (!pet.classList.contains("talking")) return false;
+  function nearBubble(cx, cy) {
     // Bubble box relative to Bolt, measured once per text/flip change (a layout read on every mousemove made the page janky).
     if (!rel) { var b = bubble.parentNode.getBoundingClientRect(); rel = { l: b.left - x, r: b.right - x, t: b.top - y, b: b.bottom - y }; }
-    var dx = Math.max(rel.l + x - e.clientX, 0, e.clientX - rel.r - x), dy = Math.max(rel.t + y - e.clientY, 0, e.clientY - rel.b - y);
-    return Math.hypot(dx, dy) < 60;
+    var dx = Math.max(rel.l + x - cx, 0, cx - rel.r - x), dy = Math.max(rel.t + y - cy, 0, cy - rel.b - y);
+    return Math.hypot(dx, dy) < 24;
   }
 
   // Pointer speed comes from real pointer movement (px per ms), never from how far Bolt's target jumped.
-  var px = 0, py = 0, pt = 0, pspeed = 0, fastSince = 0, dizzyOkAt = 0, frozen = false, resumeAt = 0;
+  var px = 0, py = 0, pt = 0, pspeed = 0, fastSince = 0, dizzyOkAt = 0, frozen = false, resumeAt = 0, lean = 0, vx = 0, vy = 0;
+  // One decision from the last pointer position; also run when the bubble or chat closes, so Bolt never waits for a mouse move.
+  // Cat: stops when you come close (soft stop, a little momentum, only on the transition) but keeps watching you.
+  function hold() { if (!frozen) { frozen = true; tx = x + vx * 3; ty = y + vy * 3; } wake(); return true; }
+  function follow() {
+    if (!pt) return false; // no pointer seen yet (touch never sets pt)
+    var talking = pet.classList.contains("talking");
+    if (reach && !hover && !(talking && nearBubble(px, py))) setReach(false);
+    if (chatting || hover || (reach && talking) || Math.hypot(px - (x + 32), py - (y + 32)) < (frozen ? 64 : 44)) return hold();
+    if (frozen) { frozen = false; resumeAt = Date.now(); } // ease in, no snap
+    tx = px + 28; ty = py + 22; wake(); return false;
+  }
+  // Any activity (move, click, key, wheel, scroll) resets the idle timer and eases Bolt out of drowsy or sleep.
+  function poke() {
+    lastMove = Date.now();
+    if (asleep || pet.classList.contains("drowsy")) { lean = lastLean = asleep ? 28 : 12; arm.style.transform = "rotate(" + lean + "deg)"; } // tick() eases the arm up from the sleep tilt, no snap
+    if (asleep) { // wake with a little shake (CSS), then the line
+      asleep = false; pet.classList.remove("asleep"); pet.classList.add("waking"); setTimeout(function () { pet.classList.remove("waking"); }, 700);
+      say("!! I was not sleeping.", 2200);
+    } else pet.classList.remove("drowsy");
+    wake();
+  }
   if (!touch) {
+    ["pointerdown", "keydown", "wheel", "scroll"].forEach(function (ev) { addEventListener(ev, poke, { passive: true, capture: true }); });
     addEventListener("mousemove", function (e) {
       var dt = e.timeStamp - pt, v = pt && dt > 0 ? Math.hypot(e.clientX - px, e.clientY - py) / dt : 0;
       px = e.clientX; py = e.clientY; pt = e.timeStamp;
       pspeed = pspeed * 0.7 + v * 0.3;
-      // Clingy but catchable: once the cursor is on top of Bolt (or its bubble), it holds still so you can click it.
-      if (nearBubble(e) || hover || Date.now() < holdUntil || chatting || Math.hypot(e.clientX - (x + 32), e.clientY - (y + 32)) < 44) {
-        frozen = true; tx = x; ty = y; pspeed = 0; fastSince = 0; lastMove = Date.now(); return;
-      }
-      if (frozen) { frozen = false; resumeAt = Date.now(); } // ease in, no snap
-      tx = e.clientX + 28; ty = e.clientY + 22; lastMove = Date.now();
-      if (asleep) { asleep = false; pet.classList.remove("asleep"); say("!! I was not sleeping.", 2200); }
+      poke();
+      // Clingy but catchable: once the cursor is on top of Bolt (or in reach mode, its bubble), it holds still so you can click it.
+      if (follow()) { pspeed = 0; fastSince = 0; return; }
       // Dizzy needs genuinely frantic shaking: over 3px/ms for 300ms, at most once per 20s, never while a bubble is up.
       if (pspeed < 3) fastSince = 0;
       else if (!fastSince) fastSince = Date.now();
@@ -145,17 +164,17 @@
   // Click Bolt: it does something weird. The "ask me" button in its bubble opens the chat.
   function openChat() { chatting = true; pet.classList.add("chatting"); pet.classList.remove("talking"); setTimeout(function () { chat.q.focus(); }, 50); }
   // Hovering Bolt brings up its bubble, so the "ask me" button is always one hover away.
-  // It also freezes in place, and keeps still for a moment after the pointer leaves so a diagonal path to the button works.
+  // It also freezes in place and enters reach mode: the bubble area holds Bolt still, so a diagonal path to the button works.
   pet.addEventListener("pointerenter", function (e) {
-    if (e.pointerType === "touch") return;
-    hover = true; tx = x; ty = y;
+    if (e.pointerType === "touch" || e.timeStamp - pt > 100) return; // not real pointer movement (Bolt glided under a still cursor)
+    hover = true; hold(); setReach(true);
     // Only after resting on Bolt for a moment, so flicking the cursor across it does not pop the bubble.
     clearTimeout(enterT);
     enterT = setTimeout(function () { if (hover && !chatting && !pet.classList.contains("talking")) say(pick(["need something?", "ask me stuff. or poke me.", "hi. again."]), 3000); }, 250);
   });
   pet.addEventListener("pointerleave", function () {
     clearTimeout(enterT);
-    hover = false; holdUntil = Date.now() + 700;
+    hover = false;
     if (pet.classList.contains("talking")) say(bubble.textContent, 2500);
   });
   pet.addEventListener("click", function (e) {
@@ -193,7 +212,12 @@
   setInterval(function () { if (!asleep && !chatting && !document.hidden && Math.random() < 0.25) antic(); }, 45000);
 
   setInterval(function () {
-    if (!asleep && Date.now() - lastMove > 9000 && !touch) { asleep = true; pet.classList.add("asleep"); say("zzz", 999999); }
+    // Nod off in two steps: drowsy at 7.5s idle, asleep at 9s.
+    if (chatting || hover) lastMove = Date.now(); // never nods off mid-chat or with the pointer on Bolt
+    var idle = Date.now() - lastMove;
+    if (asleep || touch) return;
+    if (idle > 9000) { asleep = true; pet.classList.remove("drowsy"); pet.classList.add("asleep"); say("zzz", 999999); }
+    else if (idle > 7500) pet.classList.add("drowsy");
   }, 1000);
 
   // Animate only while Bolt is catching up; stop the loop once it has arrived.
@@ -202,16 +226,18 @@
     // Glide: 8% of the gap per frame, eased in for 300ms after a freeze, and never more than 36px a frame.
     var k = still ? 1 : 0.08 * Math.min(1, 0.1 + (Date.now() - resumeAt) / 333), sx = (tx - x) * k, sy = (ty - y) * k, m = Math.hypot(sx, sy);
     if (m > 36 && !still) { sx *= 36 / m; sy *= 36 / m; }
-    x += sx; y += sy;
-    var lean = Math.round(Math.max(-25, Math.min(25, (tx - x) * 0.4)) / 4) * 4; // 4deg steps: SVG rotates cost a layout each, so fewer of them
+    x += sx; y += sy; vx = sx; vy = sy;
+    // Lean into the motion; when held still, look toward the cursor. Eased, in 4deg steps (SVG rotates cost a layout each).
+    var want = Math.max(-25, Math.min(25, frozen ? (px - (x + 32)) * 0.35 : (tx - x) * 0.4));
+    lean += (want - lean) * 0.2;
+    var l = Math.round(lean / 4) * 4;
     pet.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)"; // subpixel: no 1px stair-stepping when slowing down
-    if (lean !== lastLean) { arm.style.transform = "rotate(" + lean + "deg)"; lastLean = lean; }
+    if (l !== lastLean) { arm.style.transform = "rotate(" + l + "deg)"; lastLean = l; }
     var f = x > innerWidth - 340; if (f !== flipped) { pet.classList.toggle("flip", f); flipped = f; rel = null; }
-    if (Math.abs(tx - x) < 0.5 && Math.abs(ty - y) < 0.5) { running = false; return; }
+    if (Math.abs(tx - x) < 0.5 && Math.abs(ty - y) < 0.5 && Math.abs(want - lean) < 2) { running = false; return; }
     requestAnimationFrame(tick);
   }
   function wake() { if (!running && !touch) { running = true; requestAnimationFrame(tick); } }
-  addEventListener("mousemove", wake, { passive: true });
   wake();
   setTimeout(function () { if (!said.top) { said.top = 1; say(pick(lines.top)); } }, 1500);
 })();
