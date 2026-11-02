@@ -214,7 +214,7 @@ export default {
     }
     if (!facts.length && !pages.length) return reply(DUNNO);
     if (pageMode) facts = [];
-    const first = pageMode ? pages[0].slice(0, 280) : facts[0];
+    const first = pageMode ? trimSentences(pages[0], 280) : facts[0];
     try {
       const out = await env.AI.run("@cf/mistralai/mistral-small-3.1-24b-instruct", {
         max_tokens: 90, temperature: 0.6,
@@ -234,3 +234,10 @@ export default {
     }
   }
 };
+
+// Cut to whole sentences that fit; a single long sentence gets a clean word cut and an ellipsis.
+export function trimSentences(t, max) {
+  if (t.length <= max) return t;
+  const s = t.slice(0, max), end = s.lastIndexOf(". ");
+  return end > 40 ? s.slice(0, end + 1) : s.slice(0, s.lastIndexOf(" ")) + "...";
+}
