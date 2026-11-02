@@ -25,7 +25,7 @@
 <main id="main">
 <section class="hero" id="top">
   <div class="wrap">
-    <p class="eyebrow label-mono"><a href="index.html">&larr; Tayyab Bilal</a> · Work with me</p>
+    <div class="topbar"><p class="eyebrow label-mono"><a href="index.html">&larr; Tayyab Bilal</a> · Work with me · <a href="blog/index.html">Blog</a></p><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch light or dark theme">Light mode</button></div>
     <h1 class="h1-work">AI that is safe to let loose on your real systems.</h1>
     <p class="role">Agents, evaluation and the backend around them, built to production standard.</p>
     <p class="sub">5 years in ML and AI, about 4 of them building agents. Python, FastAPI and PostgreSQL underneath. I ship fast on other stacks too, using AI coding tools (Claude Code, Codex, OpenCode, local models), and everything comes with tests.</p>
@@ -93,8 +93,15 @@
 </main>
 
 <footer>
-  <div class="wrap">Tayyab Bilal · Lahore · <a href="https://github.com/Tayyab-Bilal">GitHub</a> · <a href="https://www.linkedin.com/in/tayyab-bilal-79b509187/">LinkedIn</a></div>
+  <div class="wrap">Tayyab Bilal · Lahore · <a href="https://github.com/Tayyab-Bilal">GitHub</a> · <a href="https://www.linkedin.com/in/tayyab-bilal-tdev/">LinkedIn</a></div>
 </footer>
+<nav class="dock" aria-label="Site">
+  <a href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a>
+  <a href="blog/index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h12l4 4v12H4z"/><path d="M8 11h8M8 15h6"/></svg><span>Blog</span></a>
+  <a href="work.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg><span>Hire</span></a>
+  <a href="index.html#contact"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Contact</span></a>
+</nav>
+<script src="assets/blog.js"></script>
 <script src="assets/bolt-lines.js?v=20261030"></script>
 <script src="assets/pet.js?v=20261030"></script>
 </body>

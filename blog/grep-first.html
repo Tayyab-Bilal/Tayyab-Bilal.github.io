@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Everyone&#x27;s first answer is a vector database. Mine was grep. | Tayyab Bilal</title>
+<meta name="description" content="Why I used keyword search to find workspace records and let the model pick from a short list. 1 to 2 minutes down to about 16 seconds.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Everyone&#x27;s first answer is a vector database. Mine was grep. | Tayyab Bilal">
+<meta property="og:description" content="Why I used keyword search to find workspace records and let the model pick from a short list. 1 to 2 minutes down to about 16 seconds.">
+<meta property="og:url" content="https://tayyab-bilal.github.io/blog/grep-first.html">
+<meta property="og:image" content="https://tayyab-bilal.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-10-26">
+<meta name="bolt-api" content="https://bolt.tayyaib055766.workers.dev">
+<meta name="theme-color" content="#121316">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Ubuntu+Sans:wght@400;500;600&family=Ubuntu+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css?v=20261102">
+</head>
+<body class="blog">
+<a class="skip" href="#main">Skip to content</a>
+<main id="main">
+<div class="wrap">
+  <div class="topbar" style="padding-top:20px"><p class="eyebrow label-mono"><a href="index.html">&larr; Blog</a> · <a href="../index.html">Tayyab Bilal</a></p><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch light or dark theme">Light mode</button></div>
+  <article class="article">
+    <h1>Everyone's first answer is a vector database. Mine was grep.</h1>
+    <p class="meta"><time datetime="2026-10-26">26 Oct 2026</time> · Agents · Search · RAG</p>
+    <div class="body">
+      <p>Everyone's first answer to "find the thing the user meant" is a vector database.</p>
+      <p>Mine was grep.</p>
+      <p>Picture an AI assistant inside a workspace app. Projects, tasks, emails, docs. A user types "move the Q4 task to next week". Before the agent can do anything it has to know which task.</p>
+      <p>That search had to respect four things. The data changes every minute. Each user sees different things. People type exact names, senders and ids. And it runs before every reply, so it has to be fast and cheap. A vector index makes all four harder.</p>
+      <p>A lot of people would reach for Graph RAG here. I didn't. The app's own links already were the graph.</p>
+      <p>So I split the job in two. Keyword search finds, the model chooses.</p>
+      <p>Fetch only this user's data, cache it for a few seconds, match phrase first, then words, then fuzzy. That gives a short list. For "the Q4 task" maybe a Q4 report, a Q4 kickoff meeting and the Q4 launch plan. The model reads that list and picks the task. One exact id, and now the agent can act.</p>
+      <p>If this sounds familiar, it's the classic two stage setup: cheap retrieval, then a smarter reranker. The twist is the reranker is the LLM, and it only ever sees a short list. No index to sync for records, no embedding bill, and a small cheap model is enough.</p>
+      <p>Finding the right record used to take 1 to 2 minutes. With this it takes about 16 seconds.</p>
+      <p>The trade-off is real. If the words don't overlap at all keyword can miss, so long documents still get keyword plus vectors.</p>
+      <p>Two days after I built it, a paper came out pointing the same way: agents searching raw text with plain tools like grep beat embedding retrieval. Link in the comments.</p>
+      <p>Spend tokens on deciding, not on searching.</p>
+      <p>Where has keyword search beaten embeddings for you, or failed you badly?</p>
+    </div>
+    <h2>The carousel</h2>
+    <ul class="slides" aria-label="Carousel slides">
+      <li><figure><img src="../assets/blog/grep-first/slide-1.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 1: Everyone reaches for a vector database. Mine was grep. Why I skipped Graph RAG, and why the LLM ends up as the reranker."></figure></li>
+      <li><figure><img src="../assets/blog/grep-first/slide-2.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 2: An AI assistant inside a workspace app. A user types &quot;move the Q4 task to next week&quot;. Vague words in, one exact record out."></figure></li>
+      <li><figure><img src="../assets/blog/grep-first/slide-3.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 3: Four things the search had to respect: fresh data, private per user, literal names and ids, and it runs every turn so it must be fast and cheap. A vector index makes all four harder."></figure></li>
+      <li><figure><img src="../assets/blog/grep-first/slide-4.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 4: Nested data suggests Graph RAG, but the app&#x27;s own links already were the graph. A second graph database adds sync races, model-written queries that break, and permissions implemented twice."></figure></li>
+      <li><figure><img src="../assets/blog/grep-first/slide-5.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 5: Keyword search finds, the model chooses. Workspace API, then keyword match (phrase, words, fuzzy), then the model picks from a short list."></figure></li>
+      <li><figure><img src="../assets/blog/grep-first/slide-6.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 6: One request end to end for &quot;move the Q4 task&quot;: fetch this user&#x27;s records, keyword match on Q4, the model picks the task, one exact id. Finding the right record went from 1 to 2 minutes to about 16 seconds."></figure></li>
+      <li><figure><img src="../assets/blog/grep-first/slide-7.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 7: With the LLM as the reranker. A table compares hybrid search with this approach. Trade-off: if the words do not overlap at all, keyword can miss, so long documents still get keyword plus vectors."></figure></li>
+      <li><figure><img src="../assets/blog/grep-first/slide-8.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 8: Why it is cheap: no embedding calls for records, the model sees snippets not whole documents, and a small cheap model is enough. Spend tokens on deciding, not on searching."></figure></li>
+      <li><figure><img src="../assets/blog/grep-first/slide-9.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 9: The research points the same way, citing the Beyond Semantic Similarity paper and the BEIR benchmark. Match the retrieval to how people actually name things."></figure></li>
+    </ul>
+    <h2>References</h2>
+    <ul class="refs">
+      <li><a href="https://arxiv.org/abs/2605.05242" rel="noopener">Beyond Semantic Similarity: Rethinking Retrieval for Agentic Search via Direct Corpus Interaction (Li et al., 3 May 2026)</a></li>
+      <li><a href="https://arxiv.org/abs/2605.15184" rel="noopener">Is Grep All You Need? How Agent Harnesses Reshape Agentic Search (Sen et al., 14 May 2026)</a></li>
+    </ul>
+    <div class="btns">
+      <!-- TODO swap for the exact LinkedIn post URL -->
+      <a class="btn primary" href="https://www.linkedin.com/in/tayyab-bilal-tdev/recent-activity/all/">Read it on LinkedIn</a>
+      <a class="btn" href="index.html">All posts</a>
+    </div>
+  </article>
+</div>
+</main>
+<footer>
+  <div class="wrap">Tayyab Bilal · Lahore · <a href="https://github.com/Tayyab-Bilal">GitHub</a> · <a href="https://www.linkedin.com/in/tayyab-bilal-tdev/">LinkedIn</a></div>
+</footer>
+<nav class="dock" aria-label="Site">
+  <a href="../index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a>
+  <a href="../blog/index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h12l4 4v12H4z"/><path d="M8 11h8M8 15h6"/></svg><span>Blog</span></a>
+  <a href="../work.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg><span>Hire</span></a>
+  <a href="../index.html#contact"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Contact</span></a>
+</nav>
+<script src="../assets/blog.js"></script>
+<script src="../assets/bolt-lines.js?v=20261031"></script>
+<script src="../assets/pet.js?v=20261031"></script>
+</body>
+</html>
