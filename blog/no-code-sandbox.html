@@ -9,7 +9,7 @@
 <meta property="og:title" content="I didn&#x27;t give my agent a code sandbox | Tayyab Bilal">
 <meta property="og:description" content="I measured a WebAssembly Python sandbox for big tool results, then used a locked-down in-memory SQLite table with an authorizer instead.">
 <meta property="og:url" content="https://tayyab-bilal.github.io/blog/no-code-sandbox.html">
-<meta property="og:image" content="https://tayyab-bilal.github.io/assets/og.png">
+<meta property="og:image" content="https://tayyab-bilal.github.io/assets/blog/no-code-sandbox/cover.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Ubuntu+Sans:wght@400;500;600&family=Ubuntu+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css?v=20261102">
+<link rel="stylesheet" href="../assets/style.css?v=20261103">
 </head>
 <body class="blog">
 <a class="skip" href="#main">Skip to content</a>
@@ -29,44 +29,80 @@
 <div class="wrap">
   <div class="topbar" style="padding-top:20px"><p class="eyebrow label-mono"><a href="index.html">&larr; Blog</a> · <a href="../index.html">Tayyab Bilal</a></p><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch light or dark theme">Light mode</button></div>
   <article class="article">
-    <h1>I didn't give my agent a code sandbox</h1>
-    <p class="meta"><time datetime="2026-11-02">2 Nov 2026</time> · Agents · Safety · SQLite</p>
-    <div class="body">
-      <p>Everyone building agents is being told the same thing right now. When a tool returns a lot of data, let the model write code to handle it.</p>
-      <p>I measured it. Then I didn't do it.</p>
-      <p>The problem is real. An agent calls an API and gets 200 rows back. Paste them into the prompt and it gets slow, expensive, and the model starts making up rows.</p>
-      <p>The popular fix is a code sandbox. The model writes a small script, the sandbox runs it, only the answer comes back.</p>
-      <p>So I tried a WebAssembly Python sandbox. Same results. But about 3 seconds to start and around 350 MB of memory per process.</p>
-      <p>And the part nobody mentions. It wasn't really a sandbox. Out of the box it could read every environment variable and call the backend over HTTP. "Runs in WASM" is not the same as "isolated".</p>
-      <p>What I used instead is boring. The big result goes into a small in memory SQLite table, and the model gets a query tool.</p>
-      <p>SQLite has a feature most people never touch, the authorizer. You give it a function and it checks with that function before every action. Mine says no to everything except reads. So a write, a DROP or an ATTACH is refused by the database itself, not by me trying to inspect the query text.</p>
-      <p>1.3 MB of extra memory. Queries in under a millisecond. I threw 9 escape attempts at it and none got through.</p>
-      <p>Models are already good at SQL. Most of the time they don't need to run code. They need a smaller language they already speak.</p>
-      <p>The model writes the query. The database decides what it's allowed to touch.</p>
-    </div>
-    <h2>The carousel</h2>
-    <ul class="slides" aria-label="Carousel slides">
-      <li><figure><img src="../assets/blog/no-code-sandbox/slide-1.webp" width="1080" height="1350" loading="lazy" decoding="async" alt="Slide 1: I didn&#x27;t give my agent a code sandbox. I measured it first."></figure></li>
-      <li><figure><img src="../assets/blog/no-code-sandbox/slide-2.webp" width="1080" height="1350" loading="lazy" decoding="async" alt="Slide 2: 200 rows back from one tool call. Pasted into the prompt it gets slow, expensive, and the model starts making up rows."></figure></li>
-      <li><figure><img src="../assets/blog/no-code-sandbox/slide-3.webp" width="1080" height="1350" loading="lazy" decoding="async" alt="Slide 3: The popular fix: let the model write code. The model writes a small script, a sandbox runs it, only the answer comes back. Anthropic and Cloudflare both push this idea."></figure></li>
-      <li><figure><img src="../assets/blog/no-code-sandbox/slide-4.webp" width="1080" height="1350" loading="lazy" decoding="async" alt="Slide 4: What I measured with a WebAssembly Python sandbox: about 3 seconds cold start and 310 to 390 MB per warm process."></figure></li>
-      <li><figure><img src="../assets/blog/no-code-sandbox/slide-5.webp" width="1080" height="1350" loading="lazy" decoding="async" alt="Slide 5: It wasn&#x27;t really a sandbox. Out of the box it could read every environment variable and call the backend over HTTP. Runs in WASM is not the same as isolated."></figure></li>
-      <li><figure><img src="../assets/blog/no-code-sandbox/slide-6.webp" width="1080" height="1350" loading="lazy" decoding="async" alt="Slide 6: What I used instead: boring SQLite. The big tool result goes into a per-task in-memory SQLite table, the model sees a short summary and a few sample rows, then queries it with SQL."></figure></li>
-      <li><figure><img src="../assets/blog/no-code-sandbox/slide-7.webp" width="1080" height="1350" loading="lazy" decoding="async" alt="Slide 7: SQLite&#x27;s authorizer checks your function before every action. A short Python authorizer allows only reads. Also one statement per query, a half-second timeout, and output capped at 200 rows."></figure></li>
-      <li><figure><img src="../assets/blog/no-code-sandbox/slide-8.webp" width="1080" height="1350" loading="lazy" decoding="async" alt="Slide 8: Side by side, sandbox versus SQLite: startup about 3 s versus 2.8 ms load, memory 310 to 390 MB versus 1.3 MB extra, isolation not on its own versus deny by default, escape attempts: 9 tried, none got through."></figure></li>
-      <li><figure><img src="../assets/blog/no-code-sandbox/slide-9.webp" width="1080" height="1350" loading="lazy" decoding="async" alt="Slide 9: The takeaway: the model writes the query, the database decides what it is allowed to touch."></figure></li>
-    </ul>
-    <h2>References</h2>
-    <ul class="refs">
-      <li><a href="https://www.anthropic.com/engineering/code-execution-with-mcp" rel="noopener">Anthropic, Code execution with MCP</a></li>
-      <li><a href="https://blog.cloudflare.com/code-mode/" rel="noopener">Cloudflare, Code Mode</a></li>
-      <li><a href="https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.set_authorizer" rel="noopener">Python docs, sqlite3 Connection.set_authorizer</a></li>
-    </ul>
-    <div class="btns">
-      <!-- TODO swap for the exact LinkedIn post URL -->
-      <a class="btn primary" href="https://www.linkedin.com/in/tayyab-bilal-tdev/recent-activity/all/">Read it on LinkedIn</a>
-      <a class="btn" href="index.html">All posts</a>
-    </div>
+    <p class="kicker label-mono">AI agents · Tool results</p>
+    <h1>I didn&#x27;t give my agent a code sandbox</h1>
+    <p class="meta"><time datetime="2026-11-02">2 Nov 2026</time> · 4 min read</p>
+    <ul class="tags"><li>Agents</li><li>Safety</li><li>SQLite</li></ul>
+    <div class="slash"></div>
+<p class="lead">Everyone building agents is being told the same thing right now: when a tool returns a lot of data, let the model write code to handle it. I measured that. Then I did not do it.</p>
+<div class="tldr"><span class="label-mono">TL;DR</span>
+<p>A WebAssembly Python sandbox gave the same results as the alternative, but took about 3 seconds to start and 310 to 390 MB per warm process, and it was not isolated out of the box. I put big tool results in a small in-memory SQLite table instead and gave the model a query tool. SQLite's authorizer makes it read-only. That cost 1.3 MB, queries ran in under a millisecond, and 9 escape attempts did not get through.</p></div>
+
+<h2>The problem is real</h2>
+<p>An agent calls an API and gets 200 rows back. If you paste them into the prompt, the agent gets slow and expensive, and the model starts making up rows.</p>
+<p>So you need a way for the model to work with a big result without reading all of it. The popular answer right now is code.</p>
+
+<h2>The popular fix, and what I measured</h2>
+<p>Anthropic's "Code execution with MCP" and Cloudflare's "Code Mode" both push the same idea. The model writes a small script, a sandbox runs it, and only the answer comes back. It is a good idea, so I measured it.</p>
+<p>I tried a WebAssembly Python sandbox. It gave the same results as the alternative. But it took about 3 seconds to start, and it used 310 to 390 MB of memory per warm process.</p>
+<p class="pull">"Runs in WASM" is not the same as "isolated".</p>
+<p>That is the part nobody mentions. Out of the box it was not really a sandbox. It could read every environment variable and call the backend over HTTP. You can lock that down, but then you are building and maintaining the isolation yourself.</p>
+
+<h2>What I used instead: boring SQLite</h2>
+<p>I compared seven options, including SQLite, JMESPath, DuckDB, CEL, jq and a Starlark or Pyodide sandbox. I chose SQLite for the results, plus JMESPath for nested JSON.</p>
+<figure class="fig">
+<svg class="fg" viewBox="0 0 480 444" role="img" aria-labelledby="f2-t f2-d" xmlns="http://www.w3.org/2000/svg"><title id="f2-t">Two ways to handle a big tool result</title><desc id="f2-d">Left path: the model writes a script and a code sandbox runs it, costing about 3 seconds to start and 310 to 390 MB per warm process, and it could read environment variables and call the backend. Right path: the rows go into an in-memory SQLite table, the model writes a query, the authorizer allows reads only, and only the requested rows come back.</desc><rect class="box" x="40" y="4" width="400" height="40" rx="8"/><text class="t" x="240.0" y="29.0" text-anchor="middle">Big tool result: 200 rows</text><path class="ar" d="M140 44V52H112V60"/><path class="ah" d="M107 52L112 60L117 52z"/><path class="ar" d="M340 44V52H368V60"/><path class="ah" d="M363 52L368 60L373 52z"/><text class="m" x="116.0" y="80" text-anchor="middle">Code sandbox</text><text class="m" x="364.0" y="80" text-anchor="middle">SQLite</text><rect class="box" x="4" y="96" width="224" height="56" rx="8"/><text class="t" x="116.0" y="129.0" text-anchor="middle">Model writes a script</text><path class="ar" d="M116.0 152V172"/><path class="ah" d="M111.0 170L116.0 178L121.0 170z"/><rect class="box" x="4" y="178" width="224" height="56" rx="8"/><text class="t" x="116.0" y="211.0" text-anchor="middle">Sandbox runs it</text><path class="ar" d="M116.0 234V254"/><path class="ah" d="M111.0 252L116.0 260L121.0 252z"/><rect class="box" x="4" y="260" width="224" height="56" rx="8"/><text class="t" x="116.0" y="293.0" text-anchor="middle">Only the answer comes back</text><rect class="warn" x="4" y="342" width="224" height="82" rx="8"/><text class="bad" x="116.0" y="366" text-anchor="middle">About 3 s to start</text><text class="bad" x="116.0" y="387" text-anchor="middle">310 to 390 MB per warm process</text><text class="bad" x="116.0" y="408" text-anchor="middle">Read env vars, called the backend</text><rect class="box" x="252" y="96" width="224" height="56" rx="8"/><text class="t" x="364.0" y="121.0" text-anchor="middle">Rows go into a small</text><text class="s" x="364.0" y="140.0" text-anchor="middle">in-memory SQLite table</text><path class="ar" d="M364.0 152V172"/><path class="ah" d="M359.0 170L364.0 178L369.0 170z"/><rect class="box" x="252" y="178" width="224" height="56" rx="8"/><text class="t" x="364.0" y="203.0" text-anchor="middle">Model writes a query</text><text class="s" x="364.0" y="222.0" text-anchor="middle">sees a summary and sample rows</text><path class="ar" d="M364.0 234V254"/><path class="ah" d="M359.0 252L364.0 260L369.0 252z"/><rect class="hi" x="252" y="260" width="224" height="56" rx="8"/><text class="t" x="364.0" y="285.0" text-anchor="middle">Authorizer checks each action</text><text class="s" x="364.0" y="304.0" text-anchor="middle">reads pass, the rest is denied</text><path class="ar" d="M364.0 316V336"/><path class="ah" d="M359.0 334L364.0 342L369.0 334z"/><rect class="box" x="252" y="342" width="224" height="56" rx="8"/><text class="t" x="364.0" y="375.0" text-anchor="middle">Only the rows it asked for</text><text class="good" x="364.0" y="422" text-anchor="middle">+1.3 MB. Under 1 ms per query.</text></svg>
+<figcaption>Same big result, two ways to handle it.</figcaption>
+</figure>
+<p>The big result goes into a small in-memory SQLite table, one per task. The model does not see the rows. It sees a short summary and a few sample rows, and it gets a query tool. Models are already good at SQL. Most of the time they do not need to run code. They need a smaller language they already speak.</p>
+
+<h2>The authorizer does the saying no</h2>
+<p>SQLite has a feature most people never touch: the authorizer. You give it a function, and SQLite asks that function before every action. Mine says yes to reads and no to everything else.</p>
+<div class="codecard"><div class="codehead"><i></i><i></i><i></i><span>authorizer.py</span></div>
+<pre><code><span class="f">ALLOWED</span> = {sqlite3.SQLITE_SELECT,
+           sqlite3.SQLITE_READ,
+           sqlite3.SQLITE_FUNCTION}
+
+<span class="k">def</span> <span class="f">authorizer</span>(action, *args):
+    <span class="k">return</span> (sqlite3.SQLITE_OK
+            <span class="k">if</span> action <span class="k">in</span> ALLOWED
+            <span class="k">else</span> sqlite3.SQLITE_DENY)
+
+conn.set_authorizer(authorizer)</code></pre></div>
+<p>So a write, a DROP or an ATTACH is refused by the database itself, not by me trying to inspect the query text. Checking text means guessing what a query will do. The authorizer is asked about the actions SQLite is actually about to take.</p>
+<p>The rest of the guard rails are plain: one statement per query, a half-second timeout, and output capped at 200 rows.</p>
+<p class="pull">The model writes the query. The database decides what it's allowed to touch.</p>
+
+<h2>Side by side</h2>
+<div class="tablewrap"><table class="cmp"><thead><tr><th></th><th>Sandbox</th><th class="b">SQLite</th></tr></thead><tbody>
+<tr><th>Startup</th><td>About 3 s</td><td class="b">2.8 ms load</td></tr>
+<tr><th>Memory</th><td>310 to 390 MB per process</td><td class="b">+1.3 MB</td></tr>
+<tr><th>Isolation</th><td>Not on its own</td><td class="b">Deny by default</td></tr>
+<tr><th>Escape attempts</th><td>n/a</td><td class="b">9 tried, none got through</td></tr>
+</tbody></table></div>
+<p class="note">These are my measurements on my setup. Nine attempts is a test, not a proof. SQL covers filtering, grouping and counting. If your agent has to run arbitrary code over the data, you need something heavier than this.</p>
+
+<h2>What I'd tell you to do</h2>
+<ul>
+<li>Measure the sandbox on your own setup: cold start, memory per process, and what it can reach (environment variables, the network).</li>
+<li>Do not treat "runs in WASM" as isolation. Test what it can read and call before you trust it.</li>
+<li>Give the model a smaller language it already knows, such as SQL, before you give it a general one.</li>
+<li>Enforce the rules in the database (the authorizer), not by inspecting query text.</li>
+<li>Add limits as well: one statement, a timeout, a row cap.</li>
+<li>Write the escape attempts down and keep running them.</li>
+<li>When someone asks for a big thing, bring a cost table, not just a yes or a no.</li>
+</ul>
+
+<h2>References</h2>
+<ul class="refs">
+<li><a href="https://www.anthropic.com/engineering/code-execution-with-mcp" rel="noopener">Anthropic, Code execution with MCP</a></li>
+<li><a href="https://blog.cloudflare.com/code-mode/" rel="noopener">Cloudflare, Code Mode</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.set_authorizer" rel="noopener">Python docs, sqlite3 Connection.set_authorizer</a></li>
+</ul>
+
+    <!-- TODO swap for the exact LinkedIn post URL -->
+    <p class="origin">This started as <a href="https://www.linkedin.com/in/tayyab-bilal-tdev/recent-activity/all/">a LinkedIn post</a>.</p>
+    <div class="btns"><a class="btn" href="index.html">All posts</a></div>
   </article>
 </div>
 </main>

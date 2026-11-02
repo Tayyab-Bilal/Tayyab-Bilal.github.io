@@ -9,7 +9,7 @@
 <meta property="og:title" content="Everyone&#x27;s first answer is a vector database. Mine was grep. | Tayyab Bilal">
 <meta property="og:description" content="Why I used keyword search to find workspace records and let the model pick from a short list. 1 to 2 minutes down to about 16 seconds.">
 <meta property="og:url" content="https://tayyab-bilal.github.io/blog/grep-first.html">
-<meta property="og:image" content="https://tayyab-bilal.github.io/assets/og.png">
+<meta property="og:image" content="https://tayyab-bilal.github.io/assets/blog/grep-first/cover.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Ubuntu+Sans:wght@400;500;600&family=Ubuntu+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css?v=20261102">
+<link rel="stylesheet" href="../assets/style.css?v=20261103">
 </head>
 <body class="blog">
 <a class="skip" href="#main">Skip to content</a>
@@ -29,45 +29,96 @@
 <div class="wrap">
   <div class="topbar" style="padding-top:20px"><p class="eyebrow label-mono"><a href="index.html">&larr; Blog</a> · <a href="../index.html">Tayyab Bilal</a></p><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch light or dark theme">Light mode</button></div>
   <article class="article">
-    <h1>Everyone's first answer is a vector database. Mine was grep.</h1>
-    <p class="meta"><time datetime="2026-10-26">26 Oct 2026</time> · Agents · Search · RAG</p>
-    <div class="body">
-      <p>Everyone's first answer to "find the thing the user meant" is a vector database.</p>
-      <p>Mine was grep.</p>
-      <p>Picture an AI assistant inside a workspace app. Projects, tasks, emails, docs. A user types "move the Q4 task to next week". Before the agent can do anything it has to know which task.</p>
-      <p>That search had to respect four things. The data changes every minute. Each user sees different things. People type exact names, senders and ids. And it runs before every reply, so it has to be fast and cheap. A vector index makes all four harder.</p>
-      <p>A lot of people would reach for Graph RAG here. I didn't. The app's own links already were the graph.</p>
-      <p>So I split the job in two. Keyword search finds, the model chooses.</p>
-      <p>Fetch only this user's data, cache it for a few seconds, match phrase first, then words, then fuzzy. That gives a short list. For "the Q4 task" maybe a Q4 report, a Q4 kickoff meeting and the Q4 launch plan. The model reads that list and picks the task. One exact id, and now the agent can act.</p>
-      <p>If this sounds familiar, it's the classic two stage setup: cheap retrieval, then a smarter reranker. The twist is the reranker is the LLM, and it only ever sees a short list. No index to sync for records, no embedding bill, and a small cheap model is enough.</p>
-      <p>Finding the right record used to take 1 to 2 minutes. With this it takes about 16 seconds.</p>
-      <p>The trade-off is real. If the words don't overlap at all keyword can miss, so long documents still get keyword plus vectors.</p>
-      <p>Two days after I built it, a paper came out pointing the same way: agents searching raw text with plain tools like grep beat embedding retrieval. Link in the comments.</p>
-      <p>Spend tokens on deciding, not on searching.</p>
-      <p>Where has keyword search beaten embeddings for you, or failed you badly?</p>
-    </div>
-    <h2>The carousel</h2>
-    <ul class="slides" aria-label="Carousel slides">
-      <li><figure><img src="../assets/blog/grep-first/slide-1.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 1: Everyone reaches for a vector database. Mine was grep. Why I skipped Graph RAG, and why the LLM ends up as the reranker."></figure></li>
-      <li><figure><img src="../assets/blog/grep-first/slide-2.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 2: An AI assistant inside a workspace app. A user types &quot;move the Q4 task to next week&quot;. Vague words in, one exact record out."></figure></li>
-      <li><figure><img src="../assets/blog/grep-first/slide-3.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 3: Four things the search had to respect: fresh data, private per user, literal names and ids, and it runs every turn so it must be fast and cheap. A vector index makes all four harder."></figure></li>
-      <li><figure><img src="../assets/blog/grep-first/slide-4.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 4: Nested data suggests Graph RAG, but the app&#x27;s own links already were the graph. A second graph database adds sync races, model-written queries that break, and permissions implemented twice."></figure></li>
-      <li><figure><img src="../assets/blog/grep-first/slide-5.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 5: Keyword search finds, the model chooses. Workspace API, then keyword match (phrase, words, fuzzy), then the model picks from a short list."></figure></li>
-      <li><figure><img src="../assets/blog/grep-first/slide-6.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 6: One request end to end for &quot;move the Q4 task&quot;: fetch this user&#x27;s records, keyword match on Q4, the model picks the task, one exact id. Finding the right record went from 1 to 2 minutes to about 16 seconds."></figure></li>
-      <li><figure><img src="../assets/blog/grep-first/slide-7.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 7: With the LLM as the reranker. A table compares hybrid search with this approach. Trade-off: if the words do not overlap at all, keyword can miss, so long documents still get keyword plus vectors."></figure></li>
-      <li><figure><img src="../assets/blog/grep-first/slide-8.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 8: Why it is cheap: no embedding calls for records, the model sees snippets not whole documents, and a small cheap model is enough. Spend tokens on deciding, not on searching."></figure></li>
-      <li><figure><img src="../assets/blog/grep-first/slide-9.webp" width="1080" height="1407" loading="lazy" decoding="async" alt="Slide 9: The research points the same way, citing the Beyond Semantic Similarity paper and the BEIR benchmark. Match the retrieval to how people actually name things."></figure></li>
-    </ul>
-    <h2>References</h2>
-    <ul class="refs">
-      <li><a href="https://arxiv.org/abs/2605.05242" rel="noopener">Beyond Semantic Similarity: Rethinking Retrieval for Agentic Search via Direct Corpus Interaction (Li et al., 3 May 2026)</a></li>
-      <li><a href="https://arxiv.org/abs/2605.15184" rel="noopener">Is Grep All You Need? How Agent Harnesses Reshape Agentic Search (Sen et al., 14 May 2026)</a></li>
-    </ul>
-    <div class="btns">
-      <!-- TODO swap for the exact LinkedIn post URL -->
-      <a class="btn primary" href="https://www.linkedin.com/in/tayyab-bilal-tdev/recent-activity/all/">Read it on LinkedIn</a>
-      <a class="btn" href="index.html">All posts</a>
-    </div>
+    <p class="kicker label-mono">AI agents · Search</p>
+    <h1>Everyone&#x27;s first answer is a vector database. Mine was grep.</h1>
+    <p class="meta"><time datetime="2026-10-26">26 Oct 2026</time> · 5 min read</p>
+    <ul class="tags"><li>Agents</li><li>Search</li><li>RAG</li></ul>
+    <div class="slash"></div>
+<p class="lead">When an AI assistant needs to find "the thing the user meant", most people reach for a vector database. I used keyword search to build a short list and let the model pick from it.</p>
+<div class="tldr"><span class="label-mono">TL;DR</span>
+<p>For records inside a workspace app (tasks, emails, docs, meetings), I match the user's words against that user's own data and hand the model a short list to choose from. There is no index to sync and no embedding bill. Finding the right record went from 1 to 2 minutes to about 16 seconds. The trade-off is real: when the words do not overlap at all, keyword search can miss.</p></div>
+
+<h2>One vague phrase, one exact id</h2>
+<p>Picture an AI assistant inside a workspace app. Projects, tasks, emails, docs, meetings. A user types "move the Q4 task to next week". Before the agent can do anything, it has to know which task.</p>
+<p>Vague words in, one exact record out. That search had to respect four things:</p>
+<ul class="facts">
+<li><b>Fresh</b>Tasks and emails change every minute.</li>
+<li><b>Private</b>Each user sees different things.</li>
+<li><b>Literal</b>People type exact names, senders and ids.</li>
+<li><b>Every turn</b>It runs before each reply, so it must be fast and cheap.</li>
+</ul>
+<p>A vector index makes all four harder. It is one more copy of the data to keep fresh. Permissions have to be mirrored onto it. Exact names get blurred into "similar" ones. And every record costs an embedding call.</p>
+
+<h2>Why not a vector index, and why not Graph RAG</h2>
+<p>Nested data (workspace, project, task, then docs, emails and meetings) makes a lot of people think of Graph RAG. I did not go that way. The app's own links already were the graph.</p>
+<p>A second graph database would have added three things I did not want: sync races with the real data, graph queries written by the model that break, and permissions implemented twice.</p>
+<p>The same goes for vectors on records. Workspace data is live, per user and full of literal names, subjects and senders. Those are exact-string problems, and embeddings blur exact strings.</p>
+
+<h2>Keyword finds, the model chooses</h2>
+<p>So I split the job in two. The first part is cheap and exact. The second part needs understanding, so it goes to the model.</p>
+<figure class="fig">
+<svg class="fg" viewBox="0 0 480 478" role="img" aria-labelledby="f1-t f1-d" xmlns="http://www.w3.org/2000/svg"><title id="f1-t">Retrieve, then pick</title><desc id="f1-d">Flow: the user request goes to the workspace API, then keyword matching builds a short list of three candidates, then the model picks the task and returns one exact id.</desc><rect class="box" x="40" y="8" width="400" height="46" rx="8"/><text class="t" x="240.0" y="28.0" text-anchor="middle">&quot;move the Q4 task to next week&quot;</text><text class="s" x="240.0" y="47.0" text-anchor="middle">what the user types</text><path class="ar" d="M240 54V78"/><path class="ah" d="M235 76L240 84L245 76z"/><rect class="box" x="40" y="84" width="400" height="54" rx="8"/><text class="t" x="240.0" y="108.0" text-anchor="middle">Workspace API, this user&#x27;s data only</text><text class="s" x="240.0" y="127.0" text-anchor="middle">permissions come with the call. Cached for a few seconds.</text><path class="ar" d="M240 138V162"/><path class="ah" d="M235 160L240 168L245 160z"/><rect class="hi" x="40" y="168" width="400" height="54" rx="8"/><text class="t" x="240.0" y="192.0" text-anchor="middle">Keyword match: phrase, then words, then fuzzy</text><text class="s" x="240.0" y="211.0" text-anchor="middle">cheap and exact. No index to sync.</text><path class="ar" d="M240 222V256"/><path class="ah" d="M235 254L240 262L245 254z"/><text class="m" x="252" y="246">short list</text><rect class="box" x="8" y="262" width="152" height="50" rx="8"/><text class="t" x="84.0" y="284.0" text-anchor="middle">Q4 report</text><text class="s" x="84.0" y="303.0" text-anchor="middle">doc</text><rect class="box" x="168" y="262" width="152" height="50" rx="8"/><text class="t" x="244.0" y="284.0" text-anchor="middle">Q4 kickoff</text><text class="s" x="244.0" y="303.0" text-anchor="middle">meeting</text><rect class="hi" x="328" y="262" width="152" height="50" rx="8"/><text class="t" x="404.0" y="284.0" text-anchor="middle">Q4 launch plan</text><text class="s" x="404.0" y="303.0" text-anchor="middle">task</text><path class="ar" d="M240 312V340"/><path class="ah" d="M235 338L240 346L245 338z"/><rect class="hi" x="40" y="346" width="400" height="54" rx="8"/><text class="t" x="240.0" y="370.0" text-anchor="middle">The model reads the list and picks</text><text class="s" x="240.0" y="389.0" text-anchor="middle">the user said &quot;task&quot;</text><path class="ar" d="M240 400V424"/><path class="ah" d="M235 422L240 430L245 422z"/><rect class="box" x="110" y="430" width="260" height="40" rx="8"/><text class="t" x="240.0" y="455.0" text-anchor="middle">One exact id. Now the agent can act.</text></svg>
+<figcaption>One request, end to end, for "move the Q4 task".</figcaption>
+</figure>
+<p>The keyword part fetches only this user's data, or reuses a copy cached for a few seconds. Because it only ever searches what that user's own call returned, permissions come for free. It matches the whole phrase first, then the words, then fuzzy. That gives a short list. For "the Q4 task" it might be a Q4 report, a Q4 kickoff meeting and the Q4 launch plan.</p>
+<p>The model reads that list and picks the task, because the user said "task". One exact id, and now the agent can act.</p>
+<p class="pull">Keyword search does the finding. The model does the understanding.</p>
+<p>It is not literally grep. It is phrase, word, then fuzzy matching, and the ranking is what makes it work.</p>
+<div class="codecard"><div class="codehead"><i></i><i></i><i></i><span>find.py</span><em>simplified</em></div>
+<pre><code><span class="k">import</span> difflib
+
+<span class="k">def</span> <span class="f">find</span>(query, records):
+    q = query.lower()
+    words = q.split()
+
+    <span class="k">def</span> <span class="f">score</span>(r):
+        text = r.name.lower()
+        phrase = q <span class="k">in</span> text                         <span class="c"># 1. whole phrase</span>
+        hits = <span class="k">sum</span>(w <span class="k">in</span> text <span class="k">for</span> w <span class="k">in</span> words)           <span class="c"># 2. how many words</span>
+        fuzzy = difflib.SequenceMatcher(None, q, text).ratio()  <span class="c"># 3. fuzzy</span>
+        <span class="k">return</span> (phrase, hits, fuzzy)               <span class="c"># compared in this order</span>
+
+    scored = [(score(r), r) <span class="k">for</span> r <span class="k">in</span> records]
+    scored.sort(key=<span class="k">lambda</span> s: s[0], reverse=<span class="k">True</span>)
+    <span class="c"># keep anything with a phrase, word or fuzzy hit (0.6 is illustrative)</span>
+    keep = [r <span class="k">for</span> s, r <span class="k">in</span> scored <span class="k">if</span> s[0] <span class="k">or</span> s[1] <span class="k">or</span> s[2] &gt; <span class="k">0.6</span>]
+    <span class="k">return</span> keep[:<span class="k">10</span>]                                  <span class="c"># a short list</span></code></pre></div>
+<p>The score is a tuple, so Python compares it left to right. An exact phrase beats any number of word hits, and word hits beat a fuzzy score. That is why a long description full of loose near-matches cannot outrank an exact hit. This sketch is cut down to show the idea, not the real code.</p>
+
+<h2>It is retrieve, then rerank</h2>
+<p>If this sounds familiar, it is the classic two stage setup: cheap retrieval, then a smarter reranker. The twist is that the reranker is the LLM, and it only ever sees a short list.</p>
+<div class="tablewrap"><table class="cmp"><thead><tr><th></th><th>Hybrid search</th><th class="b">This approach</th></tr></thead><tbody>
+<tr><th>Finds with</th><td>Keyword and vectors</td><td class="b">Keyword</td></tr>
+<tr><th>Meaning comes from</th><td>Embeddings of everything</td><td class="b">The LLM, on a short list</td></tr>
+<tr><th>Index to sync</th><td>Yes</td><td class="b">None for records</td></tr>
+</tbody></table></div>
+<p>It is also cheap, for three reasons. There are no embedding calls for records. The model sees snippets, not whole documents. And because it reads a short list, a small cheap model is enough.</p>
+<p>Finding the right record used to take 1 to 2 minutes. With this it takes about 16 seconds.</p>
+<p class="pull">Spend tokens on deciding, not on searching.</p>
+
+<h2>Where it breaks, and who else saw this</h2>
+<p>The trade-off is real. If the words do not overlap at all, keyword search can miss. So for long documents I still use keyword plus vectors, with keyword leading. Vectors earn their place when people paraphrase inside long text. They are a poor fit for finding "the Q4 task".</p>
+<p>I am not the only one who ended up here. Two days after I built it, a paper came out pointing the same way: agents searching raw text with plain tools like grep beat embedding retrieval. A second paper reached a similar conclusion later that month. Older work agrees on the keyword side: the BEIR benchmark (2021) found that plain BM25 is a hard baseline to beat out of domain. These point the same way. They do not prove it for your data.</p>
+
+<h2>What I'd tell you to do</h2>
+<ul>
+<li>Write down how your users actually name things. If it is literal (names, senders, ids), start with exact matching.</li>
+<li>Search only what the user's own call returned. Permissions and freshness come with it.</li>
+<li>Rank with a tuple (phrase, then words, then fuzzy) so an exact hit cannot be drowned out.</li>
+<li>Keep the list short and let a model choose from it. That is where the understanding belongs.</li>
+<li>Keep vectors for long documents, where the words may not overlap, and let keyword lead.</li>
+<li>Time the whole job on your own data. I measured how long it took to find the right record, not how clever the search was.</li>
+</ul>
+
+<h2>References</h2>
+<ul class="refs">
+<li><a href="https://arxiv.org/abs/2605.05242" rel="noopener">Beyond Semantic Similarity: Rethinking Retrieval for Agentic Search via Direct Corpus Interaction (Li et al., 3 May 2026)</a></li>
+<li><a href="https://arxiv.org/abs/2605.15184" rel="noopener">Is Grep All You Need? How Agent Harnesses Reshape Agentic Search (Sen et al., 14 May 2026)</a></li>
+</ul>
+
+    <!-- TODO swap for the exact LinkedIn post URL -->
+    <p class="origin">This started as <a href="https://www.linkedin.com/in/tayyab-bilal-tdev/recent-activity/all/">a LinkedIn post</a>.</p>
+    <div class="btns"><a class="btn" href="index.html">All posts</a></div>
   </article>
 </div>
 </main>

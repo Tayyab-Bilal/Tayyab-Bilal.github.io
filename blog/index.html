@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Ubuntu+Sans:wght@400;500;600&family=Ubuntu+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css?v=20261102">
+<link rel="stylesheet" href="../assets/style.css?v=20261103">
 </head>
 <body class="blog">
 <a class="skip" href="#main">Skip to content</a>
@@ -29,19 +29,27 @@
   <div class="topbar" style="padding-top:20px"><p class="eyebrow label-mono"><a href="../index.html">&larr; Tayyab Bilal</a> · Blog</p><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch light or dark theme">Light mode</button></div>
   <div class="blog-head">
     <h1>Blog</h1>
-    <p class="lede">Notes on building agents that hold up. Each post started as a LinkedIn carousel.</p>
+    <p class="lede">Notes on building agents that hold up. Each article started as a LinkedIn post.</p>
   </div>
   <!-- ADD NEW POSTS AT THE TOP of this list (newest first). Copy a whole <li>. -->
-  <ul class="post-list">
+  <ul class="post-list cards">
       <li class="post panel hud">
-        <h2><a href="no-code-sandbox.html">I didn't give my agent a code sandbox</a></h2>
-        <p class="meta"><time datetime="2026-11-02">2 Nov 2026</time> · Agents · Safety · SQLite</p>
-        <p>I measured a WebAssembly Python sandbox for big tool results, then used a locked-down in-memory SQLite table with an authorizer instead.</p>
+        <a class="cover" href="no-code-sandbox.html" tabindex="-1" aria-hidden="true"><img src="../assets/blog/no-code-sandbox/cover.webp" width="1200" height="630" loading="lazy" decoding="async" alt="Cover: I didn't give my agent a code sandbox"></a>
+        <div class="pb">
+          <h2><a href="no-code-sandbox.html">I didn't give my agent a code sandbox</a></h2>
+          <p class="meta"><time datetime="2026-11-02">2 Nov 2026</time> · 4 min read · Agents · Safety · SQLite</p>
+          <p>I measured a WebAssembly Python sandbox for big tool results, then used a locked-down in-memory SQLite table with an authorizer instead.</p>
+          <p><a class="more" href="no-code-sandbox.html">Read the article &rarr;</a></p>
+        </div>
       </li>
       <li class="post panel hud">
-        <h2><a href="grep-first.html">Everyone's first answer is a vector database. Mine was grep.</a></h2>
-        <p class="meta"><time datetime="2026-10-26">26 Oct 2026</time> · Agents · Search · RAG</p>
-        <p>Why I used keyword search to find workspace records and let the model pick from a short list. 1 to 2 minutes down to about 16 seconds.</p>
+        <a class="cover" href="grep-first.html" tabindex="-1" aria-hidden="true"><img src="../assets/blog/grep-first/cover.webp" width="1200" height="630" loading="lazy" decoding="async" alt="Cover: Everyone's first answer is a vector database. Mine was grep."></a>
+        <div class="pb">
+          <h2><a href="grep-first.html">Everyone's first answer is a vector database. Mine was grep.</a></h2>
+          <p class="meta"><time datetime="2026-10-26">26 Oct 2026</time> · 5 min read · Agents · Search · RAG</p>
+          <p>Why I used keyword search to find workspace records and let the model pick from a short list. 1 to 2 minutes down to about 16 seconds.</p>
+          <p><a class="more" href="grep-first.html">Read the article &rarr;</a></p>
+        </div>
       </li>
   </ul>
 </div>
