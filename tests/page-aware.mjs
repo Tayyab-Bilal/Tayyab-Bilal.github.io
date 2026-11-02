@@ -37,6 +37,11 @@ assert(checkOutput("the wasm sandbox ate 310 to 390 MB of memory per warm proces
 assert(!checkOutput("the wasm sandbox ate 900 MB of memory per warm process.", [], pages, true), "invented number");
 assert(!checkOutput("beep. dunno lol", [], pages, true), "ungrounded");
 assert(!checkOutput("see https://x.io sandbox memory process", [], pages, true));
+// page mode is strict: a vague, wrong paraphrase is rejected, a faithful one passes
+const au = pickPassages(ps, "what is the sqlite authorizer").map(x => x.text);
+assert(!checkOutput("sqlite is a tool that asks tayyab bilal if it can do stuff.", [], au, true), "wrong authorizer answer");
+assert(checkOutput("SQLite's authorizer is a function it checks before every action; his only allows reads, so writes, DROP and ATTACH get refused by the database itself.", [], au, true), "faithful authorizer answer");
+assert(checkOutput("the sandbox was a memory hog. It slurped up between 310 and 390 megabytes per warm process.", [], pages, true), "memory answer");
 // facts + extra page detail: numbers from the page are allowed, fact still required
 const f = grep("what is his stack backend");
 assert(checkOutput("backend: python, fastapi, postgresql, redis, qdrant, pytest and github actions. 310 MB.", f, pages, false));
