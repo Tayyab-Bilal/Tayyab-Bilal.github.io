@@ -39,6 +39,7 @@
     ["ai coding tools claude code codex cursor stack other stacks fast build", "he ships with Claude Code, Codex, OpenCode, a DeepSeek harness, T3 Code and local Ollama models. AI-accelerated on any stack."],
     ["open source github repos code tests", "10 public repos, 1,100+ passing tests. libraries he maintains in the open."],
     ["available hire contact email reach freelance remote hours timezone", "Lahore, UTC+5, open to remote, overlaps the EU day and US mornings. email: tayyaib055766@gmail.com"],
+    ["blog writing posts articles article write wrote sandbox vector database grep sqlite", "he writes a blog at /blog/. two articles so far: \"I didn't give my agent a code sandbox\" and \"Everyone's first answer is a vector database. Mine was grep.\""],
     ["cv resume download", "the Download CV button is at the top. I'd carry it to you but I have one claw."],
     ["bolt you pet robot who are you", "I'm Bolt. a pet. not an agent. I have no tools and no permissions. he made sure."]
   ];
@@ -56,7 +57,7 @@
     if (!api) { setTimeout(function () { answer.textContent = local; }, 400); return; }
     // Model proposes, code decides: the AI only rephrases facts we pass it; any error falls back to grep.
     var done = false, t = setTimeout(function () { if (!done) { done = true; answer.textContent = local; } }, 6000);
-    fetch(api, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: q }) })
+    fetch(api, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: q, page: location.pathname }) })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
       .then(function (d) { if (!done) { done = true; clearTimeout(t); answer.textContent = (d && d.answer) || local; } })
       .catch(function () { if (!done) { done = true; clearTimeout(t); answer.textContent = local; } });
