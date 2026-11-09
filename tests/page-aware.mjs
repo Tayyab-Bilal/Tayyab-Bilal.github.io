@@ -43,10 +43,10 @@ assert(!checkOutput("sqlite is a tool that asks tayyab bilal if it can do stuff.
 assert(checkOutput("SQLite's authorizer is a function it checks before every action; his only allows reads, so writes, DROP and ATTACH get refused by the database itself.", [], au, true), "faithful authorizer answer");
 assert(checkOutput("the sandbox was a memory hog. It slurped up between 310 and 390 megabytes per warm process.", [], pages, true), "memory answer");
 // facts + extra page detail: numbers from the page are allowed, fact still required
-const f = grep("what is his stack backend");
-assert(checkOutput("backend: python, fastapi, postgresql, redis, qdrant, pytest and github actions. 310 MB.", f, pages, false));
+const f = grep("what backend does he use");
+assert(checkOutput("on the backend he uses fastapi, celery, postgresql, redis and docker. 310 MB.", f, pages, false));
 // blog fact exists
-assert(grep("does he have a blog").some(x => x.includes("/blog/") && x.includes("vector database")));
+assert(grep("does he write a blog").some(x => x.includes("blog") && x.includes("two articles")));
 
 // handler end to end with a fake fetch + fake AI (no network, no Cloudflare)
 import worker from "../worker/bolt-worker.js";

@@ -47,7 +47,9 @@ No cookies, no third-party analytics, no API keys in the site.
   1. Only POST from allowed origins (the site, plus localhost:8765 for tests), JSON, body under 1 KB.
   2. Rate limits: 8/min per visitor, 60/min per worker instance.
   3. Page-aware: the page path is allowlisted (`pagePath`), the worker fetches that page from the site itself (cached 10 min), picks the top 3 passages (max 1500 chars) and answers from them.
-  4. A validator checks every answer (page mode: at least 4 content words, at least 60% found in the passages, numbers must be backed). Rejected answers fall back to a fixed fact or a trimmed passage.
+  4. Knowledge bank: `worker/knowledge.js` is a list of ~57 `[topic, fact]` lines (about, career, work, skills, approach, writing, education, practical). For each question the worker scores them with the same keyword style (topic word 2 points, word in the fact 1 point, light stemming), takes the top 5 (max ~1000 chars) and gives them to the model together with the page passages (max 1000 chars).
+  5. A validator checks every answer: at least 4 content words, at least 60% found in the chosen facts or page passages, numbers must be backed. A rejected answer (or a model error) falls back to the best fact, logged with source `knowledge`, or to a trimmed passage when the page matched best. If nothing matches at all Bolt says to ask Tayyab by email or LinkedIn (source `dunno`).
+- Editing the knowledge bank: change lines in `worker/knowledge.js` (one short plain sentence each, third person, everything there is public), run `node tests/knowledge.mjs` (it rejects banned content such as client names, pay, headcounts, work repo links), then redeploy the worker. Availability, hiring and rates have no fact on purpose; the contact line points to email and LinkedIn. `assets/bolt-lines.js` and the `facts` in `assets/pet.js` (offline answers) are separate and not covered by this test.
 - Intro: on the first page load of the day Bolt shows an intro bubble ("hi, I'm Bolt...") for `INTRO_MS` (5000, top of the intro block in `pet.js`). Hover/point comments are suppressed meanwhile; clicking Bolt or opening the chat ends it early. "Today" is a `bolt-intro` date in localStorage (no cookies); if storage fails it shows once per page load.
 - Every answered question is logged (see "Bolt chat log").
 - If the worker is down or over the free allowance, Bolt answers offline from `bolt-lines.js`.
@@ -107,6 +109,7 @@ node tests/page-aware.mjs      # Bolt page-aware mode
 node tests/worker-safety.mjs   # worker origin, size, rate limits, validator
 node tests/hit.mjs             # visitor tracker
 node tests/chats.mjs           # Bolt chat log (mocked D1)
+node tests/knowledge.mjs       # Bolt knowledge bank (banned content, retrieval, fallbacks)
 python3 tests/visits.py        # stats report
 ```
 
