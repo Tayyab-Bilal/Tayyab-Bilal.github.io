@@ -9,5 +9,5 @@ binding = "AI"
 [[d1_databases]]
 binding = "DB"
 database_name = "bolt-hits"
-database_id = "REPLACE_ME"
+database_id = "5a1b048e-9e09-4963-b0b0-fc9bc77df968"
 migrations_dir = "migrations"

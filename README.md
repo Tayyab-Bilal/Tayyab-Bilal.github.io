@@ -132,5 +132,5 @@ Every post has two parts: the LinkedIn part and the blog part. The blog part is 
 
 - [ ] Put the real LinkedIn post URLs in blog/grep-first.html and blog/no-code-sandbox.html (search for `TODO swap for the exact LinkedIn post URL`).
 - [ ] Bolt's facts still say current job is SWSAM; update when ready.
-- [ ] Tracker: run the "Go live" steps.
+- [x] Tracker live (9 Nov 2026).
 - [ ] Optional: custom domain (add a `CNAME` file and the DNS records GitHub Pages lists).
