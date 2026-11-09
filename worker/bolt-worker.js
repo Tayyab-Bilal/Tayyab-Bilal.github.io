@@ -190,15 +190,19 @@ export function uaInfo(ua, w) {
   return { browser, os, device };
 }
 
+// Daily anonymous visitor id: hash of IP + UA + day + salt. The IP itself is never stored. Shared by /hit and the chat log.
+async function visitorId(req, env) {
+  const day = new Date().toISOString().slice(0, 10), ua = req.headers.get("user-agent") || "", ip = req.headers.get("cf-connecting-ip") || "";
+  return hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${ip}|${ua}|${day}|${env.HIT_SALT || ""}`))).slice(0, 16);
+}
+
 // Returns the row to insert, or null if the hit should be ignored.
 export async function buildHit(req, body, env) {
   const path = pagePath(body && body.path);
   const ua = req.headers.get("user-agent") || "";
   if (!path || !ua || BOT_RE.test(ua)) return null;
   const cf = req.cf || {}, w = Number(body.w) || 0;
-  const day = new Date().toISOString().slice(0, 10);
-  const ip = req.headers.get("cf-connecting-ip") || "";
-  const visitor = hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${ip}|${ua}|${day}|${env.HIT_SALT || ""}`))).slice(0, 16);
+  const visitor = await visitorId(req, env);
   const dwell = Number(body.dwell);
   return {
     ts: new Date().toISOString(), path: clip(body.path, 60), referrer_host: clip(body.ref, 100).toLowerCase(),
@@ -225,6 +229,22 @@ async function handleHit(req, env, ctx) {
     }
   } catch (e) { console.log("hit: error", String(e && e.message || e).slice(0, 100)); } // never break the page
   return done();
+}
+
+// ---- Chat log: one row per answered Bolt question in D1 `chats`. Never slows or breaks the reply. No IP, no lat/long. ----
+export async function buildChat(req, env, { page, q, answer, source }) {
+  const cf = req.cf || {};
+  return { ts: new Date().toISOString(), page: clip(page, 60), question: clip(q, 500), answer: clip(answer, 1000), source: clip(source, 20),
+    country: clip(cf.country, 2), city: clip(cf.city, 60), visitor: await visitorId(req, env) };
+}
+const CHAT_COLS = ["ts", "page", "question", "answer", "source", "country", "city", "visitor"];
+
+function logChat(req, env, ctx, info) {
+  if (!env.DB) return;
+  const job = buildChat(req, env, info)
+    .then(row => env.DB.prepare(`INSERT INTO chats (${CHAT_COLS.join(",")}) VALUES (${CHAT_COLS.map(() => "?").join(",")})`).bind(...CHAT_COLS.map(c => row[c])).run())
+    .catch(e => console.log("chat: db error", String(e && e.message || e).slice(0, 100)));
+  if (ctx && ctx.waitUntil) ctx.waitUntil(job);
 }
 
 export default {
@@ -254,7 +274,9 @@ export default {
     try { body = JSON.parse((await req.text()).slice(0, 1024)); } catch { return reply("beep? that wasn't a question.", 400); }
     const q = cleanInput(body && body.q);
     if (!q) return reply("ask me something.");
-    if (isInjection(q)) return reply("nice try. I only know things about Tayyab. I have no other settings.");
+    const pg = typeof (body && body.page) === "string" ? body.page : "";
+    const answered = (answer, source) => { logChat(req, env, ctx, { page: pg, q, answer, source }); return reply(answer); };
+    if (isInjection(q)) return answered("nice try. I only know things about Tayyab. I have no other settings.", "injection");
 
     let facts = grep(q), pages = [], pageMode = false;
     const path = pagePath(body && body.page);
@@ -266,7 +288,7 @@ export default {
         pageMode = !top || ps[0].score >= top[0]; // page text wins ties and better matches
       }
     }
-    if (!facts.length && !pages.length) return reply(DUNNO);
+    if (!facts.length && !pages.length) return answered(DUNNO, "dunno");
     if (pageMode) facts = [];
     const first = pageMode ? trimSentences(pages[0], 280) : facts[0];
     try {
@@ -279,12 +301,12 @@ export default {
       });
       const answer = String(out?.response ?? out?.choices?.[0]?.message?.content ?? "").trim(); // older and OpenAI-style model outputs
       if (!answer) console.log("bolt: empty model output", JSON.stringify(out).slice(0, 400));
-      if (checkOutput(answer, facts, pages, pageMode)) return reply(answer);
+      if (checkOutput(answer, facts, pages, pageMode)) return answered(answer, "ai");
       console.log("bolt: output rejected", JSON.stringify(answer).slice(0, 300)); // no visitor text is logged
-      return reply(first);
+      return answered(first, "validator-fallback");
     } catch (e) {
       console.log("bolt: ai error", String(e && e.message || e).slice(0, 200));
-      return reply(first); // free allowance used up or model error: plain fact, never a cost
+      return answered(first, "error"); // free allowance used up or model error: plain fact, never a cost
     }
   }
 };

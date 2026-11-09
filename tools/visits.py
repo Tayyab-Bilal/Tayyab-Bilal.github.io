@@ -2,6 +2,7 @@
 """Visitor stats for the portfolio. Usage:
   python3 tools/visits.py hits.sqlite            # local sqlite (e.g. from a D1 export)
   python3 tools/visits.py --remote [--db bolt-hits]   # queries D1 through wrangler (run from site/worker or anywhere with the config)
+  --chats N prints the last N full Bolt Q&A pairs.
 Page views are rows with dwell_ms NULL; dwell rows only feed the average time on page."""
 import argparse, json, sqlite3, subprocess, sys
 from datetime import datetime, timedelta, timezone
@@ -64,7 +65,25 @@ def report(q, now=None):
     table("Top cities", f"SELECT city || ', ' || country k, COUNT(*) n FROM hits WHERE {w} AND city != '' GROUP BY k ORDER BY n DESC", "k")
     table("Devices", f"SELECT device k, COUNT(*) n FROM hits WHERE {w} GROUP BY device ORDER BY n DESC", "k")
     table("Top networks", f"SELECT as_org k, COUNT(*) n FROM hits WHERE {w} AND as_org != '' GROUP BY as_org ORDER BY n DESC", "k")
+    try:
+        c = {d: q(f"SELECT COUNT(*) n FROM chats WHERE ts >= '{since(d)}'")[0]["n"] for d in (7, 30)}
+        lines.append(f"\n== Bolt questions ==\n  {c[7]} in the last 7 days, {c[30]} in the last 30")
+        lines.append("\n== Recent Bolt questions ==")
+        recent = q("SELECT ts, page, question, country, source FROM chats ORDER BY ts DESC LIMIT 20")
+        for r in recent:
+            lines.append(f"  {r['ts'][:16]}  {r['page'] or '-':<18} {r['country'] or '--':<3} {r['source'] or '-':<18} {r['question']}")
+        if not recent:
+            lines.append("  (no data)")
+    except Exception:  # chats table not created yet (migration 0002 not applied)
+        lines.append("\n== Bolt questions ==\n  (no chats table yet: apply migration 0002)")
     return "\n".join(lines)
+
+
+def last_chats(q, n):
+    out = []
+    for r in q(f"SELECT ts, page, country, city, source, question, answer FROM chats ORDER BY ts DESC LIMIT {int(n)}"):
+        out.append(f"[{r['ts']}] {r['page']} {r['city'] or ''} {r['country'] or ''} ({r['source']})\n  Q: {r['question']}\n  A: {r['answer']}")
+    return "\n\n".join(out) or "(no chats)"
 
 
 if __name__ == "__main__":
@@ -72,7 +91,9 @@ if __name__ == "__main__":
     ap.add_argument("sqlite", nargs="?", help="local sqlite file")
     ap.add_argument("--remote", action="store_true", help="query D1 via wrangler")
     ap.add_argument("--db", default="bolt-hits", help="D1 database name (with --remote)")
+    ap.add_argument("--chats", type=int, metavar="N", help="print the last N full Bolt Q&A pairs instead of the report")
     a = ap.parse_args()
     if a.remote == bool(a.sqlite):
         sys.exit("give either a sqlite path or --remote")
-    print(report(remote_query(a.db) if a.remote else local_query(a.sqlite)))
+    q = remote_query(a.db) if a.remote else local_query(a.sqlite)
+    print(last_chats(q, a.chats) if a.chats else report(q))

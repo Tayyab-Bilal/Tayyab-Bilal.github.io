@@ -21,7 +21,7 @@ cv.pdf              CV download
 worker/             Cloudflare Worker: Bolt AI mode + visitor tracker
   bolt-worker.js    the worker
   wrangler.toml     worker config (AI binding, D1 binding)
-  migrations/       D1 table for the tracker
+  migrations/       D1 tables: hits (tracker), chats (Bolt chat log)
 tools/visits.py     local visitor stats report
 tests/              see "Tests"
 ```
@@ -48,6 +48,8 @@ No cookies, no third-party analytics, no API keys in the site.
   2. Rate limits: 8/min per visitor, 60/min per worker instance.
   3. Page-aware: the page path is allowlisted (`pagePath`), the worker fetches that page from the site itself (cached 10 min), picks the top 3 passages (max 1500 chars) and answers from them.
   4. A validator checks every answer (page mode: at least 4 content words, at least 60% found in the passages, numbers must be backed). Rejected answers fall back to a fixed fact or a trimmed passage.
+- Intro: on the first page load of the day Bolt shows an intro bubble ("hi, I'm Bolt...") for `INTRO_MS` (5000, top of the intro block in `pet.js`). Hover/point comments are suppressed meanwhile; clicking Bolt or opening the chat ends it early. "Today" is a `bolt-intro` date in localStorage (no cookies); if storage fails it shows once per page load.
+- Every answered question is logged (see "Bolt chat log").
 - If the worker is down or over the free allowance, Bolt answers offline from `bolt-lines.js`.
 
 ## Visitor tracker
@@ -68,17 +70,26 @@ cd worker && python3 ../tools/visits.py --remote
 
 Prints the last 7 and 30 days: visits, unique visitors, top pages, referrers, countries, regions (Middle East grouped), cities, devices, networks, average time on page. `python3 tools/visits.py file.sqlite` reads a local SQLite copy.
 
+## Bolt chat log
+
+Each answered question is stored in D1 table `chats` (`worker/migrations/0002_chats.sql`): time, page path, question (max 500 chars), answer (max 1000), source, country, city, visitor (same daily anonymous hash as `/hit`, one shared helper). Control characters stripped. No IP, no lat/long.
+
+- `source`: `ai` (model answer passed the validator), `validator-fallback` (model answer rejected, fixed fact or passage sent), `error` (model call failed), `dunno` (nothing matched), `injection` (canned reply).
+- The insert runs in `ctx.waitUntil` and DB errors are swallowed, so the reply is never slower or broken. Requests rejected by origin, size, content-type, rate-limit or empty-question checks are not logged.
+- `python3 tools/visits.py --remote` adds chat counts (7/30 days) and the last 20 questions. `--chats N` prints the last N full Q&A pairs.
+
 ### Go live (one time)
 
 ```bash
 cd worker
 npx wrangler d1 create bolt-hits                 # paste the database_id into wrangler.toml
 npx wrangler d1 migrations apply bolt-hits --remote
+npx wrangler d1 migrations apply bolt-hits --remote   # also applies 0002_chats (Bolt chat log); safe to re-run
 npx wrangler secret put HIT_SALT                 # any long random string
 npx wrangler deploy
 ```
 
-Then commit and push the site so Pages serves `hit.js`.
+Then commit and push the site so Pages serves `hit.js` and the new `pet.js`. Already live? Just run the migrations line, then `npx wrangler deploy`.
 
 ## Preview locally
 
@@ -95,6 +106,7 @@ node tests/bolt-grep.js        # Bolt offline answers
 node tests/page-aware.mjs      # Bolt page-aware mode
 node tests/worker-safety.mjs   # worker origin, size, rate limits, validator
 node tests/hit.mjs             # visitor tracker
+node tests/chats.mjs           # Bolt chat log (mocked D1)
 python3 tests/visits.py        # stats report
 ```
 

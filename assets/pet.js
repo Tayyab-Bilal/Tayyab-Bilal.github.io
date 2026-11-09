@@ -89,9 +89,20 @@
   function setReach(v) { reach = v; pet.classList.toggle("reach", v); }
 
   // The bubble stays up while the pointer is on Bolt, its bubble or its chat (they are all inside .pet).
-  function say(t, ms) {
+  function say(t, ms, force) {
+    if (intro && !force) return; // the intro owns the bubble until it ends
     bubble.textContent = t; rel = null; pet.classList.add("talking");
-    clearTimeout(hideT); hideT = setTimeout(function () { if (hover) return say(bubble.textContent, 1500); pet.classList.remove("talking"); setReach(false); follow(); }, ms || 3600);
+    clearTimeout(hideT); hideT = setTimeout(function () { if (hover) return say(bubble.textContent, 1500, true); pet.classList.remove("talking"); setReach(false); follow(); }, ms || 3600);
+  }
+  // Intro: on the first page load of the day Bolt says what it is, and keeps quiet about hovers/points for INTRO_MS.
+  // "Today" lives in localStorage only (no cookies). If storage fails, the intro shows once per page load.
+  var INTRO_MS = 5000, intro = false, introT;
+  function endIntro() { if (!intro) return; intro = false; clearTimeout(introT); }
+  function startIntro() {
+    try { var d = new Date().toISOString().slice(0, 10); if (localStorage.getItem("bolt-intro") === d) return false; localStorage.setItem("bolt-intro", d); } catch (e) {}
+    say("hi, I'm Bolt 👋 I can answer questions about Tayyab, his work and his writing. click me to ask.", INTRO_MS, true);
+    intro = true; introT = setTimeout(endIntro, INTRO_MS);
+    return true;
   }
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
 
@@ -163,7 +174,7 @@
   }
 
   // Click Bolt: it does something weird. The "ask me" button in its bubble opens the chat.
-  function openChat() { chatting = true; pet.classList.add("chatting"); pet.classList.remove("talking"); setTimeout(function () { chat.q.focus(); }, 50); }
+  function openChat() { endIntro(); chatting = true; pet.classList.add("chatting"); pet.classList.remove("talking"); setTimeout(function () { chat.q.focus(); }, 50); }
   // Hovering Bolt brings up its bubble, so the "ask me" button is always one hover away.
   // It also freezes in place and enters reach mode: the bubble area holds Bolt still, so a diagonal path to the button works.
   pet.addEventListener("pointerenter", function (e) {
@@ -179,6 +190,7 @@
     if (pet.classList.contains("talking")) say(bubble.textContent, 2500);
   });
   pet.addEventListener("click", function (e) {
+    endIntro();
     if (e.target.closest(".pet-ask")) { openChat(); return; }
     if (chat.contains(e.target)) return;
     if (chatting) { closeChat(); return; }
@@ -240,5 +252,7 @@
   }
   function wake() { if (!running && !touch) { running = true; requestAnimationFrame(tick); } }
   wake();
-  setTimeout(function () { if (!said.top) { said.top = 1; say(pick(lines.top)); } }, 1500);
+  var introShown = false;
+  setTimeout(function () { introShown = startIntro(); }, 800);
+  setTimeout(function () { if (!said.top && !introShown) { said.top = 1; say(pick(lines.top)); } }, 1500);
 })();
