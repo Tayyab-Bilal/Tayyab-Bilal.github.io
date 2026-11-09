@@ -1,5 +1,6 @@
 // Knowledge bank checks. Run: node tests/knowledge.mjs
 import assert from "node:assert";
+import { readFileSync } from "node:fs";
 import worker, { grep } from "../worker/bolt-worker.js";
 import { KNOWLEDGE } from "../worker/knowledge.js";
 
@@ -21,6 +22,21 @@ assert(all.includes("currently a Senior AI Engineer at SWSAM Solutions"));
 assert(all.includes("led a team of engineers"));
 assert(all.includes("5 years"));
 assert(!/SWSAM[^.]*\b(until|to|ended|left)\b[^.]*20\d\d/i.test(all.replace(/since April 2026/g, "")), "SWSAM has no end date");
+
+// offline answers (pet.js facts + hover lines, bolt-lines.js) follow the same banned list
+const rd = f => readFileSync(new URL("../assets/" + f, import.meta.url), "utf8");
+const pet = rd("pet.js");
+const offline = [pet.match(/var facts = \[[\s\S]*?\n  \];/)[0], pet.match(/var lines = \{[\s\S]*?\n  \};/)[0], pet.match(/var clickLines = .*/)[0], rd("bolt-lines.js")];
+assert(offline.every(t => t.length > 50), "offline text found");
+for (let t of offline) {
+  t = t.replace(/\b[01]{8}( [01]{8})+/g, "binary joke");
+  for (const re of BANNED) assert(!re.test(t), `banned ${re} in offline text: ${(t.match(re) || [])[0]}`);
+  assert(!/\b(95%|5x|3x|1,100|345K|114|10 public)\b|\b\d+K lines/i.test(t), "no stats beyond the approved facts");
+  assert(!/agent kit[^"]*shipped|shipped[^"]*agent kit/i.test(t), "agent kit is built and tested, not shipped");
+  assert((t.match(/[\w.+-]+@[\w-]+\.[\w.]+/g) || []).every(e => e === "tayyaib055766@gmail.com"), "only his email");
+  assert((t.match(/linkedin\.com\/in\/[\w-]+/g) || []).every(l => l === "linkedin.com/in/tayyab-bilal-tdev"), "only his linkedin");
+}
+assert(/Senior AI Engineer at SWSAM/.test(offline[0]) && /5 years/.test(offline[0]));
 
 // retrieval
 assert(grep("what did he do at TransData?").some(f => f.includes("TransData")));
@@ -48,4 +64,12 @@ r = await ask("zzzz qqqq xylophone", "whatever", "");
 assert.equal(r.answer, "not sure about that one. ask Tayyab directly: tayyaib055766@gmail.com or linkedin.com/in/tayyab-bilal-tdev"); assert.equal(r.source, "dunno");
 r = await ask("is he available for hire and what are his rates?", "yes he is available now for $50 an hour", "");
 assert(!/\$|50/.test(r.answer) && r.answer.includes("tayyaib055766@gmail.com") && r.answer.includes("linkedin.com/in/tayyab-bilal-tdev"), JSON.stringify(r));
+// live questions, model answer rejected: TransData work facts combined; availability fact intact (leading "If" kept)
+r = await ask("what did he do at transdata", "he invented a time machine at some company in 2031", "/blog/");
+assert(/microservices/.test(r.answer) && /Bedrock/.test(r.answer) && /80%/.test(r.answer) && !/^His career so far/.test(r.answer) && r.source === "knowledge", JSON.stringify(r));
+assert(r.answer.length <= 420 && r.answer.endsWith("."), "bounded whole sentences");
+r = await ask("is he available for hire", "you want to know if he is available, open to hire, or what his rates are, ask him directly by email at tayyaib055766@gmail.com", "/blog/");
+assert(r.answer.startsWith("If you want to know whether he is available,") && r.source === "knowledge", JSON.stringify(r));
+r = await ask("is he available for hire", "garbage 99", "");
+assert(r.answer.startsWith("If you want to know whether"), JSON.stringify(r));
 console.log("knowledge ok", KNOWLEDGE.length, "facts");

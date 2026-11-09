@@ -23,23 +23,23 @@
 
   // What Bolt knows: short facts taken from this page. Grep-first: score by shared words, best match wins.
   var facts = [
-    ["who tayyab about intro senior ai engineer years experience long", "Senior AI Engineer in Lahore. 5 years in ML and AI, about 4 of them building agents."],
-    ["agents langgraph react rasa agent experience", "about 4 years of agents: Rasa state machines, then hand-written ReAct loops, now LangGraph."],
-    ["current job swsam now production users", "now: Senior AI Engineer at SWSAM. the platform is in production with real users, early release. he leads a team of engineers."],
-    ["transdata previous job before qwen fine tune fine-tuning qlora inference cost", "at Transdata he fine-tuned Qwen 7B with QLoRA (over 95% accuracy) and cut inference cost about 80% with 5x throughput, serving it in 4-bit on AWS GPUs."],
-    ["quid sol first job chatbots healthcare fintech", "at Quid Sol (2022 to 2024) he built ML apps and chatbots, Rasa assistants, then ReAct agents by hand."],
-    ["rag retrieval evaluation eval evals ragas faithfulness", "RAG: yes. he designed a Three-Hook evaluation model (every query, a sampled judge, a CI golden set)."],
-    ["approval gate human in the loop permissions safety guardrails write delete", "the approval gate: every write tool goes through one checkpoint. Autonomous, Suggest Only or Disabled per action. deletes are denied on purpose."],
-    ["prompt injection security attack attacks red team", "his agent kit closed every hole a 114-attack injection suite found. that kit is built, not shipped yet."],
-    ["cost cheaper model switch planner sonnet 77", "the planner got about 77% cheaper after a model switch, passing every benchmark and end-to-end case."],
-    ["contributor codebase lines commits senior impact reviewer", "he is the #1 contributor to the SWSAM platform's codebase, about 30% of 345K lines, within 5.5 months. he is also the primary code reviewer, catching cross-tenant security bugs."],
-  ["ci pipeline build devops faster tests", "he made PR builds about 3x faster (11m20s to 3m44s) with zero changed test results."],
-  ["search grep vector database fast 16 seconds", "grep-first search: finding the right record went from 1 to 2 minutes to about 16 seconds. he wrote a post on it."],
-    ["backend python fastapi postgres postgresql redis stack api apis build services", "backend: Python, FastAPI, PostgreSQL, Redis, Qdrant, pytest, GitHub Actions. strong backend side, not just prompts."],
-    ["ai coding tools claude code codex cursor stack other stacks fast build", "he ships with Claude Code, Codex, OpenCode, a DeepSeek harness, T3 Code and local Ollama models. AI-accelerated on any stack."],
-    ["open source github repos code tests", "10 public repos, 1,100+ passing tests. libraries he maintains in the open."],
-    ["available hire contact email reach freelance remote hours timezone", "Lahore, UTC+5, open to remote, overlaps the EU day and US mornings. email: tayyaib055766@gmail.com"],
-    ["blog writing posts articles article write wrote sandbox vector database grep sqlite", "he writes a blog at /blog/. two articles so far: \"I didn't give my agent a code sandbox\" and \"Everyone's first answer is a vector database. Mine was grep.\""],
+    ["who tayyab about intro senior ai engineer years experience long", "Tayyab Bilal is an AI engineer who builds agents and AI products. He has 5 years of experience in machine learning and AI, and about 4 of those years went into building agents."],
+    ["agents langgraph react rasa agent experience", "His agent work grew in steps: Rasa state machines first, then hand written ReAct loops, then LangGraph."],
+    ["current job swsam now production users", "He is currently a Senior AI Engineer at SWSAM Solutions, where he led a team of engineers."],
+    ["transdata previous job before qwen fine tune fine-tuning qlora inference cost microservices bedrock", "At TransData he rebuilt a monolithic agent prototype as microservices, built a conversational AI platform on AWS Bedrock and Azure OpenAI, and cut inference cost by about 80% by serving a Qwen 7B model in 4 bit with QLoRA."],
+    ["quid sol first job chatbots healthcare fintech", "At Quid Sol he built machine learning apps and chatbots for clients in healthcare, e-commerce, fintech and customer service."],
+    ["rag retrieval evaluation eval evals", "At TransData he built RAG pipelines with hybrid search, reranking and vector databases. He also writes evals to measure whether AI features actually work."],
+    ["approval gate human in the loop permissions safety guardrails guardian write delete", "At SWSAM he designed Guardian, a permission layer for AI actions where the model proposes and code decides. It denies by default, so any action the rules do not clearly allow waits for a human to approve it."],
+    ["prompt injection security attack attacks red team adversarial", "He tests his agents by attacking them on purpose, using adversarial test suites, before real users meet them. At SWSAM he built and tested an agent kit for building specialist agents."],
+    ["cost cheaper model switch planner sonnet 77", "At SWSAM he cut planning cost by about 77% by moving the planner to a different model, with every test still passing."],
+    ["code review security reviewer bugs senior impact", "At SWSAM he does security focused code review and has caught serious bugs, like users being able to act as other users."],
+    ["ci pipeline build devops tests", "At SWSAM he set up the CI pipeline from scratch."],
+    ["search grep vector database fast", "At SWSAM he chose grep first retrieval over a vector database for agent search, because it is cheaper, faster and always fresh. He wrote a post on it."],
+    ["backend python fastapi postgres postgresql redis stack api apis build services", "On the backend he uses FastAPI, Celery, PostgreSQL, Redis and Docker. His main language is Python."],
+    ["ai coding tools claude code codex stack other stacks fast build", "He builds with Claude Code, Codex, OpenCode, a DeepSeek harness, T3 Code and local Ollama models."],
+    ["education study university degree certifications anthropic", "He studied Computer Science at University of Central Punjab in Lahore, and in 2026 he earned 8 Anthropic certifications."],
+    ["available hire contact email reach freelance remote hours timezone location lahore rates linkedin", "If you want to know whether he is available, open to hire, or what his rates are, ask him directly by email at tayyaib055766@gmail.com or on LinkedIn at linkedin.com/in/tayyab-bilal-tdev."],
+    ["blog writing posts articles article write wrote sandbox vector database grep sqlite", "He writes a blog on this site, with two articles so far: \"I didn't give my agent a code sandbox\" and \"Everyone's first answer is a vector database. Mine was grep.\""],
     ["cv resume download", "the Download CV button is at the top. I'd carry it to you but I have one claw."],
     ["bolt you pet robot who are you", "I'm Bolt. a pet. not an agent. I have no tools and no permissions. he made sure."]
   ];
@@ -52,7 +52,7 @@
     return { hit: best, all: facts.filter(function (f) { var k = words(f[0]); return qs.some(function (w) { return k.indexOf(w) >= 0; }); }).slice(0, 3) };
   }
   function ask(q) {
-    var g = grep(q), local = g.hit ? g.hit[1] : "dunno. not on this page. email him: tayyaib055766@gmail.com";
+    var g = grep(q), local = g.hit ? g.hit[1] : "dunno. not on this page. ask him: tayyaib055766@gmail.com or linkedin.com/in/tayyab-bilal-tdev";
     answer.textContent = "thinking… (beep)";
     if (!api) { setTimeout(function () { answer.textContent = local; }, 400); return; }
     // Model proposes, code decides: the AI only rephrases facts we pass it; any error falls back to grep.
@@ -71,11 +71,11 @@
     top: ["hi. I'm Bolt. I follow people.", "he made me. I'm the least tested thing here.", "scroll. go on. I'll come with you."],
     experience: ["5 years. I've been around for 5 minutes.", "SWSAM: real people use his stuff. none of them have met me."],
     "case-gate": ["this is the thing that stops me deleting things.", "I asked for delete rights. denied. on purpose."],
-    "case-kit": ["114 attacks. I tried a 115th. it didn't work.", "the code decides, not the model. rude, but fair."],
-    "case-auto": ["it runs at 3 a.m. with nobody watching. like me.", "77% cheaper. I'm free, for the record."],
+    "case-kit": ["he attacked his own agents on purpose. I respect that.", "the code decides, not the model. rude, but fair."],
+    "case-auto": ["it runs at 3 a.m. with nobody watching. like me.", "cheaper planning. I'm free, for the record."],
     "case-rag": ["three hooks. I only have one claw.", "the judge checks answers. nobody checks mine."],
     demo: ["press the buttons. I'll watch.", "try delete_project. I dare you."],
-    oss: ["1,100+ tests. I have zero. living dangerously.", "all of it is open. go poke it."],
+    oss: ["his code is tested. mine is mostly vibes.", "all of it is open. go poke it."],
     writing: ["he wrote about grep. I can't read."],
     contact: ["email him. I'll wait here. forever.", "the button is right there. I can see it from here."],
     fit: ["if you nodded at any of these, he's your guy.", "I am also a problem. he can't fix me."],

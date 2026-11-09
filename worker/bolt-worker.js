@@ -31,18 +31,34 @@ const STOP = " the and has have had does did what how many much who for with abo
 const stem = w => w.replace(/(ied|ies)$/, "y").replace(/(ing|es|ed|s)$/, "");
 const words = t => (t.toLowerCase().match(/[a-z0-9]+/g) || []).filter(w => w.length > 2 && !STOP.includes(` ${w} `));
 
-// Topic word counts 2, a word in the fact counts 1. Light stemming so "studied" meets "study" and "agents" meets "agent".
+// Names (companies, tools, "University") = capitalized words in the middle of a fact. A question naming one boosts facts with it.
+const ENTS = new Set(FACTS.flatMap(f => (f[1].match(/(?<=[a-z,:'"] )[A-Z][A-Za-z0-9]+/g) || []).map(w => stem(w.toLowerCase()))).filter(w => !" tayyab bilal ".includes(` ${w} `)));
+
+// Topic word counts 2, a word in the fact counts 1, a named entity found in the fact adds 3 and its work facts 1 more,
+// so "what did he do at transdata" ranks the TransData work facts above the one-line career summary.
+// Light stemming so "studied" meets "study" and "agents" meets "agent". Row: [score, fact, index, topic, entityHits].
 function grepScored(q, max = 5, cap = 1000) {
   const qs = [...new Set(words(q).map(stem))];
   const out = []; let used = 0;
   for (const x of FACTS.map((f, i) => {
     const k = words(f[0]).map(stem), b = words(f[1]).map(stem);
-    return [qs.reduce((n, w) => n + (k.includes(w) ? 2 : b.includes(w) ? 1 : 0), 0), f[1], i];
+    const ent = qs.filter(w => ENTS.has(w) && b.includes(w)).length;
+    return [qs.reduce((n, w) => n + (k.includes(w) ? 2 : b.includes(w) ? 1 : 0), 0) + ent * 3 + (ent && f[0] === "work" ? 1 : 0), f[1], i, f[0], ent];
   }).filter(x => x[0] > 0).sort((a, b) => b[0] - a[0] || a[2] - b[2])) {
     if (out.length >= max || used + x[1].length > cap) continue;
     out.push(x); used += x[1].length;
   }
   return out;
+}
+// Several facts about the same named entity: answer with the top 2 to 3 whole facts of the best one's topic (max 420 chars).
+export function combine(scored) {
+  const top = scored[0];
+  if (!top || !top[4]) return top ? top[1] : "";
+  const out = []; let used = 0;
+  for (const x of scored) {
+    if (x[4] && x[3] === top[3] && out.length < 3 && used + x[1].length + 1 <= 420) { out.push(x[1]); used += x[1].length + 1; }
+  }
+  return out.join(" ");
 }
 export function grep(q) { return grepScored(q).map(x => x[1]); }
 
@@ -269,8 +285,11 @@ export default {
       }
     }
     if (!facts.length && !pages.length) return answered(NOT_SURE, "dunno");
+    // Availability / hire / rates / contact: the approved contact fact goes out word for word. The model is not asked, so it cannot reword it
+    // (live bug: it paraphrased "If you want to know whether..." into "you want to know if..." and lost the "If").
+    if (scored.length && scored[0][3] === "practical") return answered(scored[0][1], "knowledge");
     // fallback when the model fails: the page passage if the page matched best, else the best fact
-    const fallback = () => pageMode ? [trimSentences(pages[0], 280), null] : [facts[0], "knowledge"];
+    const fallback = () => pageMode ? [trimSentences(pages[0], 280), null] : [combine(scored), "knowledge"];
     try {
       const out = await env.AI.run("@cf/mistralai/mistral-small-3.1-24b-instruct", {
         max_tokens: 90, temperature: 0.6,
