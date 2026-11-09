@@ -177,8 +177,58 @@ function limited(ip) {
   return false;
 }
 
+// ---- Visitor tracker: POST /hit stores one row in D1. Never stores IP or lat/long; IP only feeds the daily hash. ----
+const BOT_RE = /bot|crawl|spider|preview|headless/i;
+const clip = (v, n) => (typeof v === "string" || typeof v === "number" ? String(v) : "").replace(/[\u0000-\u001f\u007f]/g, "").slice(0, n);
+const hex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+
+export function uaInfo(ua, w) {
+  const browser = /edg\//i.test(ua) ? "Edge" : /opr\/|opera/i.test(ua) ? "Opera" : /firefox|fxios/i.test(ua) ? "Firefox" : /chrome|crios/i.test(ua) ? "Chrome" : /safari/i.test(ua) ? "Safari" : "Other";
+  const os = /android/i.test(ua) ? "Android" : /iphone|ipad|ipod/i.test(ua) ? "iOS" : /windows/i.test(ua) ? "Windows" : /mac os/i.test(ua) ? "macOS" : /cros/i.test(ua) ? "ChromeOS" : /linux/i.test(ua) ? "Linux" : "Other";
+  const mobile = /mobi|iphone|android.*mobile/i.test(ua), tablet = /ipad|tablet|android(?!.*mobile)/i.test(ua);
+  const device = tablet ? "tablet" : mobile ? "mobile" : w > 0 && w < 600 ? "mobile" : "desktop";
+  return { browser, os, device };
+}
+
+// Returns the row to insert, or null if the hit should be ignored.
+export async function buildHit(req, body, env) {
+  const path = pagePath(body && body.path);
+  const ua = req.headers.get("user-agent") || "";
+  if (!path || !ua || BOT_RE.test(ua)) return null;
+  const cf = req.cf || {}, w = Number(body.w) || 0;
+  const day = new Date().toISOString().slice(0, 10);
+  const ip = req.headers.get("cf-connecting-ip") || "";
+  const visitor = hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${ip}|${ua}|${day}|${env.HIT_SALT || ""}`))).slice(0, 16);
+  const dwell = Number(body.dwell);
+  return {
+    ts: new Date().toISOString(), path: clip(body.path, 60), referrer_host: clip(body.ref, 100).toLowerCase(),
+    country: clip(cf.country, 2), is_eu: cf.isEUCountry === "1" || cf.isEUCountry === true ? 1 : 0, continent: clip(cf.continent, 2),
+    region: clip(cf.region, 60), city: clip(cf.city, 60), postal_code: clip(cf.postalCode, 12), timezone: clip(cf.timezone, 40),
+    asn: Number.isFinite(Number(cf.asn)) ? Number(cf.asn) : null, as_org: clip(cf.asOrganization, 80), colo: clip(cf.colo, 8),
+    ...uaInfo(ua, w), lang: clip(body.lang, 16), visitor,
+    dwell_ms: dwell > 0 && dwell < 86400000 ? Math.round(dwell) : null // dwell beacons are their own row; page views have dwell_ms NULL
+  };
+}
+
+const HIT_COLS = ["ts", "path", "referrer_host", "country", "is_eu", "continent", "region", "city", "postal_code", "timezone", "asn", "as_org", "colo", "device", "browser", "os", "lang", "visitor", "dwell_ms"];
+
+async function handleHit(req, env, ctx) {
+  const done = () => new Response(null, { status: 204, headers: { "access-control-allow-origin": req.headers.get("origin"), "cache-control": "no-store" } });
+  try {
+    if (Number(req.headers.get("content-length") || 0) > 1024) return new Response(null, { status: 400 });
+    const body = JSON.parse((await req.text()).slice(0, 1024)); // sendBeacon sends text/plain to avoid a preflight, so no content-type check
+    const row = await buildHit(req, body, env);
+    if (row && env.DB) {
+      const job = env.DB.prepare(`INSERT INTO hits (${HIT_COLS.join(",")}) VALUES (${HIT_COLS.map(() => "?").join(",")})`)
+        .bind(...HIT_COLS.map(c => row[c])).run().catch(e => console.log("hit: db error", String(e && e.message || e).slice(0, 100)));
+      ctx && ctx.waitUntil ? ctx.waitUntil(job) : await job;
+    }
+  } catch (e) { console.log("hit: error", String(e && e.message || e).slice(0, 100)); } // never break the page
+  return done();
+}
+
 export default {
-  async fetch(req, env) {
+  async fetch(req, env, ctx) {
     const origin = req.headers.get("origin") || "";
     const ok = ALLOWED.includes(origin);
     const headers = {
@@ -191,6 +241,10 @@ export default {
     };
     const reply = (answer, status = 200) => new Response(JSON.stringify({ answer }), { status, headers });
     if (req.method === "OPTIONS") return new Response(null, { headers });
+    if (new URL(req.url).pathname === "/hit") {
+      if (req.method !== "POST" || !ok) return new Response(null, { status: 403 });
+      return handleHit(req, env, ctx);
+    }
     if (req.method !== "POST" || !ok) return reply("no.", 403);
     if (!(req.headers.get("content-type") || "").includes("application/json")) return reply("no.", 415);
     if (Number(req.headers.get("content-length") || 0) > 1024) return reply("too long.", 413);

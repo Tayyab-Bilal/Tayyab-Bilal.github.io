@@ -4,3 +4,10 @@ compatibility_date = "2026-10-01"
 
 [ai]
 binding = "AI"
+
+# Visitor tracker (POST /hit). Create with `npx wrangler d1 create bolt-hits`, then paste its id here.
+[[d1_databases]]
+binding = "DB"
+database_name = "bolt-hits"
+database_id = "REPLACE_ME"
+migrations_dir = "migrations"
